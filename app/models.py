@@ -1,18 +1,32 @@
-from datetime import datetime
-from enum import Enum
+from pydantic.main import BaseModel
 from typing import List
 
-from pydantic import Field
-from pydantic.main import BaseModel
-from pydantic.networks import EmailStr, IPvAnyAddress
+class Writer(BaseModel):
+    writer_name: str = ''
+    writer_id: str = ''
 
+class Contents(BaseModel):
+    contents_id: int = 0
+    title: str = ''
+    thumbnail: str = ''
+    Introduction: str = ''
+    writer: Writer = {}
+    language: str = 'KR'
+    is_translate: bool = False
+    original_id: int = -1
 
-class UserMe(BaseModel):
-    id: int
-    email: str = None
-    nickname: str = None
-    status: str = None
-    profile_img: str = None
+class MainContents(BaseModel):
+    main_contents_list: List[Contents] = []
 
-    class Config:
-        orm_mode = True
+class FeedContents(Writer):
+    feed_contents_list: List[Contents] = []
+
+class MainWriters(BaseModel):
+    main_writer_list: List[Writer]
+
+class ReadingContents(Contents):
+    contents: str = ''
+    translated_contents_list: List[Contents] = []
+
+class TranslatingContents(Contents):
+    contents: str = ''

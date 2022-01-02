@@ -39,8 +39,8 @@ def create_app():
 
     # 라우터 정의
     app.include_router(index.router)
-    app.include_router(services.router, tags=["Services"], prefix="/services")
-    app.include_router(users.router, tags=["Users"], prefix="/users")
+    app.include_router(services.router, tags=["Services"])
+    app.include_router(users.router, tags=["Users"])
     return app
 
 
