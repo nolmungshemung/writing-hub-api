@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import redis
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -48,15 +47,6 @@ class SQLAlchemy:
             pool_recycle=pool_recycle,
             pool_pre_ping=True,
         )
-        # if is_testing:  # create schema
-        #     db_url = self._engine.url
-        #     except_schema_db_url = f"{db_url.drivername}://{db_url.username}:{db_url.password}@{db_url.host}"
-        #     schema_name = db_url.database
-        #     temp_engine = create_engine(except_schema_db_url, echo=echo, pool_recycle=pool_recycle, pool_pre_ping=True)
-        #     if _database_exist(temp_engine, schema_name):
-        #         _drop_database(temp_engine, schema_name)
-        #     _create_database(temp_engine, schema_name)
-        #     temp_engine.dispose()
 
         self._session = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
@@ -94,44 +84,5 @@ class SQLAlchemy:
         return self._engine
 
 
-class SessionStore:
-    """Store session data in Redis."""
-    def __init__(self, app: FastAPI = None, **kwargs):
-        if app is not None:
-            self.init_app(app=app, **kwargs)
-
-    def init_app(self, **kwargs):
-        """
-        REDIS 초기화 함수
-        :param kwargs:
-        :return:
-        """
-        redis_url = kwargs.get("REDIS_URL")
-        redis_pass = kwargs.get("REDIS_PASS")
-        self.redis = redis.StrictRedis(
-            host=redis_url,
-            port=6379,
-            db=0,
-            password=redis_pass
-        )
-
-
-    def set(self, token, key, value, ttl):
-        self.refresh(token, ttl)
-        return self.redis.hset(token, key, value)
-
-    def get(self, token, key, ttl):
-        self.refresh(token, ttl)
-        return self.redis.hget(token, key)
-
-    def incr(self, token, key, ttl, incr_value):
-        self.refresh(token, ttl)
-        return self.redis.hincrby(token, key, incr_value)
-
-    def refresh(self, token, ttl):
-        self.redis.expire(token, ttl)
-
-
 db = SQLAlchemy()
 Base = declarative_base()
-redis_cache = SessionStore()

@@ -7,7 +7,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from app.common.consts import EXCEPT_PATH_LIST, EXCEPT_PATH_REGEX
-from app.errors.exceptions import APIException, SqlFailureEx, APIQueryStringEx
+from app.errors.exceptions import APIException, SqlFailureEx
 
 from app.utils.date_utils import D
 from app.utils.logger import api_logger
@@ -33,9 +33,8 @@ async def access_control(request: Request, call_next):
         response = await call_next(request)
         await api_logger(request=request, response=response)
     except Exception as e:
-
         error = await exception_handler(e)
-        error_dict = dict(status=error.status_code, msg=error.msg, detail=error.detail, code=error.code)
+        error_dict = dict(status_code=error.status_code, msg=error.msg, data={})
         response = JSONResponse(status_code=error.status_code, content=error_dict)
         await api_logger(request=request, error=error)
 
@@ -53,5 +52,5 @@ async def exception_handler(error: Exception):
     if isinstance(error, sqlalchemy.exc.OperationalError):
         error = SqlFailureEx(ex=error)
     if not isinstance(error, APIException):
-        error = APIException(ex=error, detail=str(error))
+        error = APIException(ex=error)
     return error

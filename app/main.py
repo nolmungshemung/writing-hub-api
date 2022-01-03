@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
-from app.database.conn import db, redis_cache
+from app.database.conn import db
 from app.common.config import conf
 from app.middlewares.token_validator import access_control
 from app.middlewares.trusted_hosts import TrustedHostMiddleware
@@ -22,9 +22,6 @@ def create_app():
     conf_dict = asdict(c)
     db.init_app(app, **conf_dict)
     # 데이터 베이스 이니셜라이즈
-
-    redis_cache.init_app(**conf_dict)
-    # 레디스 이니셜라이즈
 
     # 미들웨어 정의
     app.add_middleware(middleware_class=BaseHTTPMiddleware, dispatch=access_control)
