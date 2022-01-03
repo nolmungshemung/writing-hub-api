@@ -99,10 +99,12 @@ class ReadingContents(Contents):
 
     Contents 상속
     contents: 작품 내용
+    created_date: 작품 등록 일자(timestamp로 변환)
     translated_contents_list: 번역본 작품 리스트(작성일자 기준 내림차순 정렬)
     '''
 
     contents: str = ''
+    created_date: int = 0
     translated_contents_list: List[Contents] = []
 
 
@@ -157,3 +159,13 @@ class NameRegistration(BaseModel):
     '''
 
     name: str = ''
+
+
+class UserRegistration(BaseModel):
+    '''
+    유저 데이터 입력 인터페이스
+
+    user_id: 유저 식별자
+    '''
+
+    user_id: str = ''
