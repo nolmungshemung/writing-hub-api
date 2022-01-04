@@ -1,6 +1,12 @@
 # writing-hub-api
 writinghub api server
 
+
+### 참고
+- Swagger: https://dev-api.writinghub.app/docs
+- ERD: https://www.erdcloud.com/d/eYXit3bhdgwqKQPys
+- Trello: https://trello.com/b/eZ1pFOtT/writinghubbackend
+
 ### 프로그램 폴더 구조
 
 ```
@@ -38,12 +44,14 @@ Github
 - class는 camle case 사용
 - 전역 변수는 대문자와 _ 를 사용해 작성 (예시, MYSQL_URL)
 
+
 ### 기술 스택
 - Python 3.8
 - FastAPI
 - AWS RDS(Mysql)
 - AWS Elastic Beanstalk
 - Docker
+
 
 ### Commit 메세지 규칙
 ```
