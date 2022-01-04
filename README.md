@@ -7,6 +7,25 @@ writinghub api server
 - ERD: https://www.erdcloud.com/d/eYXit3bhdgwqKQPys
 - Trello: https://trello.com/b/eZ1pFOtT/writinghubbackend
 
+
+### 개발환경 세팅
+```
+Pycharm 기준
+
+가상 환경 생성
+File > Settings > Project > Python Interpreter > Add... > Virtualenv > Python3.8
+
+필요 라이브러리 설치
+Terminal > "pip install -r requirements.txt" 명령어 입력
+
+환경 변수 설정
+컴파일 : Edit Configurations > Environment variables
+콘솔 : File > Settings > Build, Excution, Deployment > Console > Python Console > Environment variables
+터미널 : File > Settings > Tools > Terminal > Environment variables
+
+```
+
+
 ### 프로그램 폴더 구조
 
 ```
