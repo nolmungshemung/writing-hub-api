@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
-    SuccessResponse, NameRegistration, UserRegistration
+    SuccessResponse
 
 router = APIRouter(prefix='/services')
 
@@ -218,32 +218,3 @@ async def writing_contents(data: WritingContents) -> SuccessResponse:
         data={}
     )
 
-@router.post('/name_registration', response_model=SuccessResponse)
-async def name_registration(data: NameRegistration) -> SuccessResponse:
-    '''
-    필명 등록 페이지에서 사용자 필명 데이터를 입력받는 API
-
-    :param data: 사용자 필명:
-    :return SuccessResponse:
-    '''
-    print(data)
-    return SuccessResponse(
-        status_code=200,
-        msg='요청 성공',
-        data={}
-    )
-
-@router.post('/user_registration', response_model=SuccessResponse)
-async def user_registration(data: UserRegistration) -> SuccessResponse:
-    '''
-    유저 데이터를 입력받는 API
-
-    :param data: 유저 식별자:
-    :return SuccessResponse:
-    '''
-    print(data)
-    return SuccessResponse(
-        status_code=200,
-        msg='요청 성공',
-        data={}
-    )

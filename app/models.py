@@ -169,3 +169,22 @@ class UserRegistration(BaseModel):
     '''
 
     user_id: str = ''
+
+
+class Users(BaseModel):
+    '''
+    유저 데이터
+
+    user_id: 유저 식별자
+    user_name: 유저 필명
+    '''
+
+    user_id: str = ''
+    user_name: str = ''
+
+class UserData(SuccessResponse):
+    '''
+    유저 정보를 반환하는 데이터 인터페이스
+    '''
+
+    data: Users = {}
