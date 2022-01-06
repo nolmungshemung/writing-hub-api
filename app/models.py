@@ -66,12 +66,14 @@ class MainContentsData(SuccessResponse):
     data: MainContents = {}
 
 
-class FeedContents(Writer):
+class FeedContents(BaseModel):
     '''
     피드 페이지에서 보여지는 컨텐츠 데이터
-
+    writer: 작가 정보
     feed_contents_list: 작품 리스트(작성일자 기준 내림차순 정렬)
     '''
+
+    writer: Writer = {}
     feed_contents_list: List[Contents] = []
 
 

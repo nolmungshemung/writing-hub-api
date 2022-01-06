@@ -170,8 +170,10 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
         status_code=200,
         msg='응답 성공',
         data=FeedContents(
-            writer_name='장발장',
-            writer_id='10asff',
+            writer=Writer(
+                writer_name='장발장',
+                writer_id='10asff'
+            ),
             feed_contents_list=[
                 Contents(
                     contents_id=20,
