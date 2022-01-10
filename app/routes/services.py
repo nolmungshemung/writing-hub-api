@@ -15,7 +15,6 @@ async def main_contents(keyword: str) -> MainContentsData:
     '''
 
     return MainContentsData(
-        status_code=200,
         msg='응답 성공',
         data=MainContents(
             main_contents_list=[
@@ -58,7 +57,6 @@ async def main_writers(keyword: str) -> MainWritersData:
     :return MainWritersData:
     '''
     return MainWritersData(
-        status_code=200,
         msg='응답 성공',
         data=MainWriters(
             main_writer_list=[
@@ -83,7 +81,6 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
     :return ReadingContentsData:
     '''
     return ReadingContentsData(
-        status_code=200,
         msg='응답 성공',
         data=ReadingContents(
             contents_id=21,
@@ -139,7 +136,6 @@ async def translating_contents(contents_id: int) -> TranslatingContentsData:
     :return TranslatingContentsData:
     '''
     return TranslatingContentsData(
-        status_code=200,
         msg='응답 성공',
         data=TranslatingContents(
             contents_id=21,
@@ -167,7 +163,6 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     :return FeedContentsData:
     '''
     return FeedContentsData(
-        status_code=200,
         msg='응답 성공',
         data=FeedContents(
             writer=Writer(
@@ -215,7 +210,6 @@ async def writing_contents(data: WritingContents) -> SuccessResponse:
     '''
     print(data)
     return SuccessResponse(
-        status_code=200,
         msg='요청 성공',
         data={}
     )

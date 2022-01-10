@@ -12,7 +12,6 @@ async def user_info(user_id: str) -> UserData:
     :return UserData:
     '''
     return UserData(
-        status_code=200,
         msg='응답 성공',
         data=Users(
             user_id=user_id,
@@ -31,7 +30,6 @@ async def name_registration(data: NameRegistration) -> SuccessResponse:
     '''
     print(data)
     return SuccessResponse(
-        status_code=200,
         msg='요청 성공',
         data={}
     )
@@ -47,7 +45,6 @@ async def user_registration(data: UserRegistration) -> SuccessResponse:
     '''
     print(data)
     return SuccessResponse(
-        status_code=200,
         msg='요청 성공',
         data={}
     )

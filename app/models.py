@@ -11,7 +11,7 @@ class SuccessResponse(BaseModel):
     data: API 데이터 반환값
     '''
 
-    status_code: int = 200
+    # status_code: int = 200
     msg: str = '응답 성공'
     data: Dict = {}
 
