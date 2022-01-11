@@ -29,7 +29,9 @@ async def main_contents(keyword: str) -> MainContentsData:
                     ),
                     language='영어',
                     is_translate=True,
-                    original_id=24
+                    original_id=24,
+                    views=0,
+                    translation_num=0
                 ),
                 Contents(
                     contents_id=21,
@@ -42,7 +44,9 @@ async def main_contents(keyword: str) -> MainContentsData:
                     ),
                     language='한국어',
                     is_translate=False,
-                    original_id=-1
+                    original_id=-1,
+                    views=0,
+                    translation_num=0
                 )
             ]
         )
@@ -94,6 +98,8 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
             language='한국어',
             is_translate=False,
             original_id=-1,
+            views=0,
+            translation_num=0,
             contents='그때 내가 왜그랬는지 도무지 이해할 수 없네\n 배고픔이 사람을 이렇게 만들줄이야',
             created_date=1641495600,
             translated_contents_list=[
@@ -108,7 +114,9 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
                     ),
                     language='영어',
                     is_translate=True,
-                    original_id=21
+                    original_id=21,
+                    views=0,
+                    translation_num=0
                 ),
                 Contents(
                     contents_id=43,
@@ -121,7 +129,9 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
                     ),
                     language='영어',
                     is_translate=True,
-                    original_id=21
+                    original_id=21,
+                    views=0,
+                    translation_num=0
                 )
             ]
         )
@@ -149,6 +159,8 @@ async def translating_contents(contents_id: int) -> TranslatingContentsData:
             language='한국어',
             is_translate=False,
             original_id=-1,
+            views=0,
+            translation_num=0,
             contents='그때 내가 왜그랬는지 도무지 이해할 수 없네\n 배고픔이 사람을 이렇게 만들줄이야'
         )
     )
@@ -181,7 +193,9 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
                     ),
                     language='영어',
                     is_translate=True,
-                    original_id=24
+                    original_id=24,
+                    views=0,
+                    translation_num=0,
                 ),
                 Contents(
                     contents_id=21,
@@ -194,7 +208,9 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
                     ),
                     language='한국어',
                     is_translate=False,
-                    original_id=-1
+                    original_id=-1,
+                    views=0,
+                    translation_num=0,
                 )
             ]
         )

@@ -50,6 +50,8 @@ class Contents(BaseModel):
     language: str = '한국어'
     is_translate: bool = False
     original_id: int = -1
+    views: int = 0
+    translation_num: int = 0
 
 
 class MainContents(BaseModel):
