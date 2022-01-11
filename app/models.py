@@ -155,6 +155,15 @@ class WritingContents(BaseModel):
     original_id: int = -1
 
 
+class IncreaseViews(BaseModel):
+    '''
+    작품 조회수를 늘리기 위한 API 인터페이스
+
+    contents_id: 작품 식별자
+    '''
+    contents_id: int = 0
+
+
 class NameRegistration(BaseModel):
     '''
     필명 등록 페이지에서 사용하는 API 데이터 입력 인터페이스

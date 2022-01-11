@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
-    SuccessResponse
+    SuccessResponse, IncreaseViews
 
 router = APIRouter(prefix='/services')
 
@@ -216,6 +216,7 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
         )
     )
 
+
 @router.post('/writing_contents', response_model=SuccessResponse)
 async def writing_contents(data: WritingContents) -> SuccessResponse:
     '''
@@ -230,3 +231,17 @@ async def writing_contents(data: WritingContents) -> SuccessResponse:
         data={}
     )
 
+
+@router.post('/increase_views', response_model=SuccessResponse)
+async def increase_views(data: IncreaseViews) -> SuccessResponse:
+    '''
+    작품 조회수 카운트를 위한 API
+
+    :param data: 작품 직별자:
+    :return SuccessResponse:
+    '''
+    print(data)
+    return SuccessResponse(
+        msg='요청 성공',
+        data={}
+    )
