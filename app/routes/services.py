@@ -2,11 +2,12 @@ from fastapi import APIRouter
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews
+from typing import Optional
 
 router = APIRouter(prefix='/services')
 
 @router.get('/main_contents', response_model=MainContentsData)
-async def main_contents(keyword: str) -> MainContentsData:
+async def main_contents(keyword: Optional[str] = None) -> MainContentsData:
     '''
     메인 페이지에서 표시되는 작품 데이터를 반환하는 API
 
@@ -53,7 +54,7 @@ async def main_contents(keyword: str) -> MainContentsData:
     )
 
 @router.get('/main_writers', response_model=MainWritersData)
-async def main_writers(keyword: str) -> MainWritersData:
+async def main_writers(keyword: Optional[str] = None) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
 
