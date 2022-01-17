@@ -101,16 +101,17 @@ Github
 꼬리말(Footer)
 	선택 사항이므로 모든 commit에 꼬리말을 작성할 필요는 없습니다.
 	Issue tracker ID를 작성할 때 사용합니다.
-	해결: 이슈 해결 시 사용
-	관련: 해당 commit에 관련된 이슈 번호
-	참고: 참고할 이슈가 있는 경우 사용
+	Resolves: 이슈 해결 시 사용
+	Related to: 해당 commit에 관련된 이슈 번호
+	Ref: 참고할 이슈가 있는 경우 사용
+	Fixes: 이슈 수정중
 
 예시
-	Feat: 유저 등록 비즈니스 로직 추가(#123)
+	Feat: 유저 등록 비즈니스 로직 추가
 
 	유저 등록 비즈니스 로직 추가
 	  - app/helper/users.py: 유저 정보를 입력받아 DB에 저장하는 비즈니스 로직 추가
 
-	해결: #123
+	Resolves: #123
 
 ```
