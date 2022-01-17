@@ -35,8 +35,8 @@ async def name_registration(data: NameRegistration) -> SuccessResponse:
     )
 
 
-@router.post('/user_registration', response_model=SuccessResponse)
-async def user_registration(data: UserRegistration) -> SuccessResponse:
+@router.post('/user_login', response_model=UserData)
+async def user_login(data: UserRegistration) -> UserData:
     '''
     유저 데이터를 입력받는 API
 
@@ -44,8 +44,11 @@ async def user_registration(data: UserRegistration) -> SuccessResponse:
     :return SuccessResponse:
     '''
     print(data)
-    return SuccessResponse(
+    return UserData(
         msg='요청 성공',
-        data={}
+        data=Users(
+            user_id=data.user_id,
+            user_name='장발장'
+        )
     )
 
