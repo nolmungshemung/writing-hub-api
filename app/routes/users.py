@@ -20,8 +20,8 @@ async def user_info(user_id: str) -> UserData:
     )
 
 
-@router.post('/name_registration', response_model=SuccessResponse)
-async def name_registration(data: NameRegistration) -> SuccessResponse:
+@router.post('/name_registration', response_model=UserData)
+async def name_registration(data: NameRegistration) -> UserData:
     '''
     필명 등록 페이지에서 사용자 필명 데이터를 입력받는 API
 
@@ -29,9 +29,12 @@ async def name_registration(data: NameRegistration) -> SuccessResponse:
     :return SuccessResponse:
     '''
     print(data)
-    return SuccessResponse(
+    return UserData(
         msg='요청 성공',
-        data={}
+        data=Users(
+            user_id=data.user_id,
+            user_name='장발장'
+        )
     )
 
 
