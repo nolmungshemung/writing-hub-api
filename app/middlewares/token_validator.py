@@ -34,7 +34,7 @@ async def access_control(request: Request, call_next):
         await api_logger(request=request, response=response)
     except Exception as e:
         error = await exception_handler(e)
-        error_dict = dict(status_code=error.status_code, msg=error.msg, data={})
+        error_dict = dict(msg=error.msg, data={})
         response = JSONResponse(status_code=error.status_code, content=error_dict)
         await api_logger(request=request, error=error)
 

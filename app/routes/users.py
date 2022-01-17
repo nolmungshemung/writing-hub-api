@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from app.models import SuccessResponse, NameRegistration, UserRegistration, UserData, Users
 router = APIRouter(prefix='/user')
 
+from app.errors.exceptions import NotFoundUserEx
 
 @router.get('/user_info', response_model=UserData)
 async def user_info(user_id: str) -> UserData:
@@ -11,6 +12,8 @@ async def user_info(user_id: str) -> UserData:
     :param user_id 유저 식별자:
     :return UserData:
     '''
+    if user_id == 'aaa':
+        raise NotFoundUserEx(user_id=user_id)
     return UserData(
         msg='응답 성공',
         data=Users(

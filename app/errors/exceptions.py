@@ -26,10 +26,10 @@ class APIException(Exception):
 
 
 class NotFoundUserEx(APIException):
-    def __init__(self, user_id: int = None, ex: Exception = None):
+    def __init__(self, user_id: str = None, ex: Exception = None):
         super().__init__(
             status_code=StatusCode.HTTP_404,
-            msg=f"해당 유저를 찾을 수 없습니다.",
+            msg=f"{user_id} 해당 유저를 찾을 수 없습니다.",
             ex=ex,
         )
 
