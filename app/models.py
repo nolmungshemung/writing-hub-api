@@ -170,7 +170,7 @@ class NameRegistration(BaseModel):
 
     name: 필명
     '''
-
+    user_id: str = ''
     name: str = ''
 
 

@@ -25,7 +25,7 @@ async def name_registration(data: NameRegistration) -> UserData:
     '''
     필명 등록 페이지에서 사용자 필명 데이터를 입력받는 API
 
-    :param data: 사용자 필명:
+    :param data: 유저 식별자, 필명:
     :return SuccessResponse:
     '''
     print(data)
@@ -33,7 +33,7 @@ async def name_registration(data: NameRegistration) -> UserData:
         msg='요청 성공',
         data=Users(
             user_id=data.user_id,
-            user_name='장발장'
+            user_name=data.name
         )
     )
 
