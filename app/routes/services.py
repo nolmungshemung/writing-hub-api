@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews
@@ -6,7 +6,7 @@ from typing import Optional
 
 router = APIRouter(prefix='/services')
 
-@router.get('/main_contents', response_model=MainContentsData)
+@router.get(path='/main_contents', response_model=MainContentsData)
 async def main_contents(keyword: Optional[str] = None) -> MainContentsData:
     '''
     메인 페이지에서 표시되는 작품 데이터를 반환하는 API
@@ -53,7 +53,7 @@ async def main_contents(keyword: Optional[str] = None) -> MainContentsData:
         )
     )
 
-@router.get('/main_writers', response_model=MainWritersData)
+@router.get(path='/main_writers', response_model=MainWritersData)
 async def main_writers(keyword: Optional[str] = None) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
@@ -77,7 +77,7 @@ async def main_writers(keyword: Optional[str] = None) -> MainWritersData:
         )
     )
 
-@router.get('/reading_contents', response_model=ReadingContentsData)
+@router.get(path='/reading_contents', response_model=ReadingContentsData)
 async def reading_contents(contents_id: int) -> ReadingContentsData:
     '''
     글읽기 페이지에서 표시되는 작품 데이터를 반환하는 API
@@ -138,7 +138,7 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
         )
     )
 
-@router.get('/translating_contents', response_model=TranslatingContentsData)
+@router.get(path='/translating_contents', response_model=TranslatingContentsData)
 async def translating_contents(contents_id: int) -> TranslatingContentsData:
     '''
     번역 페이지에서 표시되는 데이터를 반환하는 API
@@ -167,7 +167,7 @@ async def translating_contents(contents_id: int) -> TranslatingContentsData:
     )
 
 
-@router.get('/feed_contents', response_model=FeedContentsData)
+@router.get(path='/feed_contents', response_model=FeedContentsData)
 async def feed_contents(writer_id: str) -> FeedContentsData:
     '''
     피드 페이지에서 표시되는 데이터를 반환하는 API
@@ -218,7 +218,7 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     )
 
 
-@router.post('/writing_contents', response_model=SuccessResponse)
+@router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 async def writing_contents(data: WritingContents) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
@@ -233,7 +233,7 @@ async def writing_contents(data: WritingContents) -> SuccessResponse:
     )
 
 
-@router.post('/increase_views', response_model=SuccessResponse)
+@router.post(path='/increase_views', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
 async def increase_views(data: IncreaseViews) -> SuccessResponse:
     '''
     작품 조회수 카운트를 위한 API

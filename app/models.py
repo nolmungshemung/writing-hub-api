@@ -171,7 +171,7 @@ class NameRegistration(BaseModel):
     name: 필명
     '''
     user_id: str = ''
-    name: str = ''
+    user_name: str = ''
 
 
 class UserRegistration(BaseModel):
@@ -184,7 +184,7 @@ class UserRegistration(BaseModel):
     user_id: str = ''
 
 
-class Users(BaseModel):
+class UserInfo(BaseModel):
     '''
     유저 데이터
 
@@ -200,4 +200,4 @@ class UserData(SuccessResponse):
     유저 정보를 반환하는 데이터 인터페이스
     '''
 
-    data: Users = {}
+    data: UserInfo = {}
