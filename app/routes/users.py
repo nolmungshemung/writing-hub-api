@@ -54,6 +54,7 @@ async def name_registration(data: NameRegistration) -> UserData:
         )
     )
 
+
 @router.post(
     path='/user_login',
     response_model=UserData,

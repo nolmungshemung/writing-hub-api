@@ -6,11 +6,20 @@ from typing import Optional
 
 router = APIRouter(prefix='/services')
 
+
 @router.get(path='/main_contents', response_model=MainContentsData)
-async def main_contents(keyword: Optional[str] = None) -> MainContentsData:
+async def main_contents(
+        start: int = 0,
+        count: int = 10,
+        base_time: int = 0,
+        keyword: Optional[str] = None
+) -> MainContentsData:
     '''
     메인 페이지에서 표시되는 작품 데이터를 반환하는 API
 
+    :param start: 가져오려는 데이터 시작점:
+    :param count: 가져오려는 데이터 개수:
+    :param base_time: 기준 시점, timestamp로 소수점 없이 입력(시간순서대로 정렬된 데이터가 새로 입력되는 데이터와 관계없이 중복되지 않기 위해 필요):
     :param keyword: 검색어:
     :return MainContentsData:
     '''
@@ -53,11 +62,19 @@ async def main_contents(keyword: Optional[str] = None) -> MainContentsData:
         )
     )
 
+
 @router.get(path='/main_writers', response_model=MainWritersData)
-async def main_writers(keyword: Optional[str] = None) -> MainWritersData:
+async def main_writers(
+        start: int = 0,
+        count: int = 10,
+        base_time: int = 0,
+        keyword: Optional[str] = None
+) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
-
+    :param start: 가져오려는 데이터 시작점:
+    :param count: 가져오려는 데이터 개수:
+    :param base_time: 기준 시점, timestamp로 소수점 없이 입력(시간순서대로 정렬된 데이터가 새로 입력되는 데이터와 관계없이 중복되지 않기 위해 필요):
     :param keyword: 검색어:
     :return MainWritersData:
     '''
@@ -76,6 +93,7 @@ async def main_writers(keyword: Optional[str] = None) -> MainWritersData:
             ]
         )
     )
+
 
 @router.get(path='/reading_contents', response_model=ReadingContentsData)
 async def reading_contents(contents_id: int) -> ReadingContentsData:
@@ -137,6 +155,7 @@ async def reading_contents(contents_id: int) -> ReadingContentsData:
             ]
         )
     )
+
 
 @router.get(path='/translating_contents', response_model=TranslatingContentsData)
 async def translating_contents(contents_id: int) -> TranslatingContentsData:
