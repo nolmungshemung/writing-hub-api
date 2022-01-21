@@ -64,7 +64,6 @@ async def name_registration(data: NameRegistration, session: Session = Depends(d
         raise DuplicateNameEx(user_name=data.user_name)
 
 
-
 @router.post(
     path='/user_login',
     response_model=UserData,
@@ -78,27 +77,15 @@ async def user_login(data: UserRegistration, session: Session = Depends(db.sessi
     :param session: DB 세션:
     :return SuccessResponse:
     '''
-    print(data)
-    ### ORM으로 데이터 입력 예제
-    if data.user_id == 'test':
-        new_user = Users(
-            user_id=data.user_id,
-            user_name='무명'
-        )
-        session.add(new_user)
-        session.commit()
-
-        return UserData(
-            msg='요청 성공',
-            data=UserInfo(
-                user_id=data.user_id,
-                user_name='무명'
-            )
-        )
+    # DB 에 있는 사용자인지 확인
+    count = Users.count_users_by_user_id(session, data.user_id)
+    if (count < 1):
+        Users.create_user(session, auto_commit=True, user_id=data.user_id, user_name='무명')
+    user = Users.get(user_id=data.user_id)
     return UserData(
         msg='요청 성공',
         data=UserInfo(
-            user_id=data.user_id,
-            user_name='장발장'
+            user_id=user.user_id,
+            user_name=user.user_name
         )
     )
