@@ -68,3 +68,11 @@ class DivisionByZeroEx(APIException):
             msg=f"분모가 0일 때 발생하는 에러입니다.",
             ex=ex,
         )
+
+class DuplicateNameEx(APIException):
+    def __init__(self, user_name: str = None, ex: Exception = None):
+        super().__init__(
+            status_code=409,
+            msg=f"{user_name} 이미 존재하는 필명입니다.",
+            ex=ex,
+        )
