@@ -77,7 +77,7 @@ async def user_login(data: UserRegistration, session: Session = Depends(db.sessi
     :param session: DB 세션:
     :return SuccessResponse:
     '''
-    # DB 에 있는 사용자인지 확인
+    # DB에 입력되어 있는 사용자인지 확인하는 기능 구현
     count = Users.count_users_by_user_id(session, data.user_id)
     if (count < 1):
         Users.create_user(session, auto_commit=True, user_id=data.user_id, user_name='무명')
