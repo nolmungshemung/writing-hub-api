@@ -1,4 +1,3 @@
-
 from sqlalchemy import (
     Column,
     String,
@@ -7,6 +6,7 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
+
 
 class UserRepository:
     def __init__(self):
@@ -36,22 +36,27 @@ class UserRepository:
         return result
 
     @classmethod
-    def update_name(self, session: Session = None, auto_commit: bool = False, user_id = '', user_name = ''):
-        user = session.query(Users).filter(Users.user_id == user_id).update({'user_name': user_name});
+    def create_user(cls, session: Session = None, auto_commit: bool = False, user_id='', user_name=''):
+        user = Users(user_id=user_id, user_name=user_name)
+        session.add(user)
         session.commit()
 
     @classmethod
-    def count_users_by_user_id(self, session: Session = None, user_id = ''):
+    def update_name(cls, session: Session = None, auto_commit: bool = False, user_id='', user_name=''):
+        user = session.query(Users).filter(Users.user_id == user_id).update({'user_name': user_name})
+        session.commit()
+
+    @classmethod
+    def count_users_by_user_id(cls, session: Session = None, user_id=''):
         sess = next(db.session()) if not session else session
         result = sess.query(Users).filter(Users.user_id == user_id).count()
         return result
 
     @classmethod
-    def count_users_by_user_name(self, session: Session = None, user_name = ''):
+    def count_users_by_user_name(cls, session: Session = None, user_name=''):
         sess = next(db.session()) if not session else session
         result = sess.query(Users).filter(Users.user_name == user_name).count()
         return result
-
 
 
 class Users(Base, UserRepository):
