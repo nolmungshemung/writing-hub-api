@@ -155,15 +155,6 @@ class WritingContents(BaseModel):
     original_id: int = -1
 
 
-class EditingContents(WritingContents):
-    '''
-    작품 수정할 때 사용하는 API 입력 데이터 인터페이스 WritingContents 상속
-
-    contents_id: 작품 식별자
-    '''
-    contents_id: int = 0
-
-
 class IncreaseViews(BaseModel):
     '''
     작품 조회수를 늘리기 위한 API 인터페이스
