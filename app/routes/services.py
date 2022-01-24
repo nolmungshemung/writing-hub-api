@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
-    SuccessResponse, IncreaseViews
+    SuccessResponse, IncreaseViews, EditingContents
 from typing import Optional
 
 router = APIRouter(prefix='/services')
@@ -241,6 +241,21 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
 async def writing_contents(data: WritingContents) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
+
+    :param data: 작품 데이터:
+    :return SuccessResponse:
+    '''
+    print(data)
+    return SuccessResponse(
+        msg='요청 성공',
+        data={}
+    )
+
+
+@router.post(path='/editing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+async def editing_contents(data: EditingContents) -> SuccessResponse:
+    '''
+    글수정 페이지에서 작성한 작품 데이터를 입력받는 API
 
     :param data: 작품 데이터:
     :return SuccessResponse:
