@@ -80,6 +80,7 @@ async def user_login(data: UserRegistration, session: Session = Depends(db.sessi
     # DB에 입력되어 있는 사용자인지 확인하는 기능 구현
     count = Users.count_users_by_user_id(session, data.user_id)
     if (count < 1):
+        # 카카오 계정 식별자를 입력받아 DB에 저장하는 기능 구현(user_name은 무명으로 기본값 세팅)
         Users.create_user(session, auto_commit=True, user_id=data.user_id, user_name='무명')
     user = Users.get(user_id=data.user_id)
     return UserData(
