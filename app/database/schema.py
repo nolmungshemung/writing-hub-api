@@ -7,6 +7,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
+from app.models import WritingContents
 
 
 class UserRepository:
@@ -66,18 +67,45 @@ class Users(Base, UserRepository):
     user_name = Column(String(length=20), nullable=False)
 
 
+class ContentsRepository:
+    def __init__(self):
+        self._q = None
+        self._session = None
+        self.served = None
+
+    @classmethod
+    def create_contents(cls, session: Session = None, writing_content: WritingContents = None):
+        content = Contents(writer_id=writing_content.writer_id,
+                           contents=writing_content.contents,
+                           is_translate=writing_content.is_translate,
+                           original_id=writing_content.original_id,
+                           language=writing_content.language,
+                           title=writing_content.title,
+                           thumbnail=writing_content.thumbnail,
+                           introduction=writing_content.introduction,
+                           views=writing_content.views)
+        session.add(content)
+        session.commit()
+
+    '''@classmethod
+    def add_content_views(cls, session: Session = None, contents_id=''):
+        views = session.query(Contents.views).filter(Contents.contents_id == contents_id)
+        user = session.query(Contents).filter(Contents.contents_id == contents_id).update({'views': views + 1})
+        session.commit()'''
+
+
 # Contents table define for api
-class Contents(Base, UserRepository):
+class Contents(Base, ContentsRepository):
     __tablename__ = "Contents"
-    contents_id = Column(mysql.BIGINT(unsigned=True), primary_key=True, nullable=False)
+    contents_id = Column(mysql.BIGINT(unsigned=True), primary_key=True, autoincrement=True, nullable=False, index=True)
     writer_id = Column(mysql.VARCHAR(length=100), nullable=False)
     contents = Column(mysql.TEXT)
     is_translate = Column(mysql.TINYINT(unsigned=True))
     original_id = Column(mysql.BIGINT(unsigned=True))
     language = Column(mysql.VARCHAR(length=10))
-    created_date = Column(mysql.DATETIME)
+    created_date = Column(mysql.DATETIME, server_default='CURRENT_TIMESTAMP')
     title = Column(mysql.VARCHAR(length=100))
     thumbnail = Column(mysql.VARCHAR(length=200))
     introduction = Column(mysql.VARCHAR(length=200))
-    updated_date = Column(mysql.DATETIME)
-    views = Column(mysql.BIGINT)
+    updated_date = Column(mysql.DATETIME, server_default='CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+    views = Column(mysql.BIGINT(unsigned=True))

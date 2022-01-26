@@ -1,7 +1,12 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews, EditingContents
+
+from app.database.conn import db
+from app.database.schema import Contents
+from sqlalchemy.orm import Session
+
 from typing import Optional
 
 router = APIRouter(prefix='/services')
@@ -238,14 +243,16 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
 
 
 @router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def writing_contents(data: WritingContents) -> SuccessResponse:
+async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
 
-    :param data: 작품 데이터:
+    :param data: 작품 데이터:\n
+    :param session: DB 세션:\n
     :return SuccessResponse:
     '''
-    print(data)
+    # print(data)
+    Contents.create_contents(session, data)
     return SuccessResponse(
         msg='요청 성공',
         data={}
