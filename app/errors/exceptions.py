@@ -69,10 +69,20 @@ class DivisionByZeroEx(APIException):
             ex=ex,
         )
 
+
 class DuplicateNameEx(APIException):
     def __init__(self, user_name: str = None, ex: Exception = None):
         super().__init__(
             status_code=409,
             msg=f"{user_name} 이미 존재하는 필명입니다.",
+            ex=ex,
+        )
+
+
+class NotFoundContentsEx(APIException):
+    def __init__(self, contents_id: str = None, ex: Exception = None):
+        super().__init__(
+            status_code=StatusCode.HTTP_404,
+            msg=f"{contents_id} 해당 컨텐츠를 찾을 수 없습니다.",
             ex=ex,
         )

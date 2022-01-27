@@ -6,7 +6,10 @@ from app.models import Contents, Writer, MainContents, MainWriters, ReadingConte
 from app.database.conn import db
 from app.database.schema import Contents
 from sqlalchemy.orm import Session
-from app.error_models import NotProperWritingContents
+
+from app.errors.exceptions import NotFoundContentsEx
+from app.error_models import NotProperWritingContents, NotFoundContents
+
 
 from typing import Optional
 
@@ -243,7 +246,13 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     )
 
 
-@router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    path='/writing_contents',
+    response_model=SuccessResponse,
+    responses={
+        404: {"model": NotProperWritingContents}
+    }
+)
 async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
@@ -308,15 +317,26 @@ async def editing_contents(data: EditingContents) -> SuccessResponse:
     )
 
 
-@router.post(path='/increase_views', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def increase_views(data: IncreaseViews) -> SuccessResponse:
+@router.post(
+    path='/increase_views',
+    response_model=SuccessResponse,
+    responses={
+        404: {"model": NotFoundContents}
+    }
+)
+async def IncreaseContentViews(data: IncreaseViews, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     작품 조회수 카운트를 위한 API
 
     :param data: 작품 직별자:
     :return SuccessResponse:
     '''
-    print(data)
+    count = Contents.count_by_contents_id(session, data.contents_id)
+    if count < 1:
+        raise NotFoundContentsEx(contents_id=data.contents_id)
+
+    Contents.increase_content_views(session, data.contents_id)
+
     return SuccessResponse(
         msg='요청 성공',
         data={}

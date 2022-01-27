@@ -30,3 +30,13 @@ class NotProperWritingContents(WritingContents):
 
     msg: str = 'WritingContents were not proper'
     data: Dict = {}
+
+
+class NotFoundContents(APIExceptionModel):
+    '''
+    error response schema
+    해당 contents_id를 가진 컨텐츠가 없는 경우
+    '''
+
+    msg : str = 'contents_id was not founded'
+    data: Dict = {}

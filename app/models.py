@@ -206,6 +206,7 @@ class UserInfo(BaseModel):
     user_id: str = ''
     user_name: str = ''
 
+
 class UserData(SuccessResponse):
     '''
     유저 정보를 반환하는 데이터 인터페이스
