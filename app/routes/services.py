@@ -6,6 +6,7 @@ from app.models import Contents, Writer, MainContents, MainWriters, ReadingConte
 from app.database.conn import db
 from app.database.schema import Contents
 from sqlalchemy.orm import Session
+from app.error_models import NotProperWritingContents
 
 from typing import Optional
 
@@ -251,8 +252,41 @@ async def writing_contents(data: WritingContents, session: Session = Depends(db.
     :param session: DB 세션:\n
     :return SuccessResponse:
     '''
-    # print(data)
+
+    if data.title == '':
+        print("asdasdasd")
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents title',
+            data={}
+        )
+    if data.thumbnail == '':
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents thumbnail',
+            data={}
+        )
+    if data.introduction == '':
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents introduction',
+            data={}
+        )
+    if data.contents == '':
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents contents',
+            data={}
+        )
+    if data.writer_id == '':
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents writer_id',
+            data={}
+        )
+    if data.language == '':
+        return NotProperWritingContents(
+            msg='Not Proper WritringContents language',
+            data={}
+        )
+
     Contents.create_contents(session, data)
+
     return SuccessResponse(
         msg='요청 성공',
         data={}
