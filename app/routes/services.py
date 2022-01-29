@@ -6,7 +6,9 @@ from app.models import Contents, Writer, MainContents, MainWriters, ReadingConte
 from app.database.conn import db
 from app.database.schema import Contents
 from sqlalchemy.orm import Session
-from app.error_models import NotProperWritingContents
+
+from app.errors.exceptions import NotProperWritingContentsEx
+from app.error_models import NotProperWritingContentsModel
 
 from typing import Optional
 
@@ -243,7 +245,11 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     )
 
 
-@router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    path='/writing_contents',
+    response_model=SuccessResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
@@ -254,39 +260,19 @@ async def writing_contents(data: WritingContents, session: Session = Depends(db.
     '''
 
     if data.title == '':
-        print("asdasdasd")
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents title',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='title')
     if data.thumbnail == '':
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents thumbnail',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='thumbnail')
     if data.introduction == '':
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents introduction',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='introduction')
     if data.contents == '':
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents contents',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='contents')
     if data.writer_id == '':
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents writer_id',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='writer_id')
     if data.language == '':
-        return NotProperWritingContents(
-            msg='Not Proper WritringContents language',
-            data={}
-        )
+        raise NotProperWritingContentsEx(wrong_value='language')
 
     Contents.create_contents(session, data)
-
     return SuccessResponse(
         msg='요청 성공',
         data={}

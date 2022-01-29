@@ -69,6 +69,7 @@ class DivisionByZeroEx(APIException):
             ex=ex,
         )
 
+
 class DuplicateNameEx(APIException):
     def __init__(self, user_name: str = None, ex: Exception = None):
         super().__init__(
