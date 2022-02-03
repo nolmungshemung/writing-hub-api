@@ -71,6 +71,15 @@ class ContentRepository:
         sess = next(db.session()) if not session else session
         result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.contents_id == contents_id).all()
         return result
+
+    @classmethod
+    def get_translated_contents(cls, session: Session = None, contents_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.original_id == contents_id).order_by(Content.updated_date.desc()).all()
+        return result
+
+
+
 class Users(Base, UserRepository):
     __tablename__ = "Users"
     user_id = Column(String(length=100), primary_key=True, nullable=False)

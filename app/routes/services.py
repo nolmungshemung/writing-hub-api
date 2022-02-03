@@ -1,11 +1,19 @@
-from fastapi import APIRouter, status
+import time
+
+from fastapi import APIRouter, Depends, status
+
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews, EditingContents
 from typing import Optional
+from app.database.conn import db
+from app.database.schema import Content, Users
+from sqlalchemy.orm import Session
+
+from app.errors.exceptions import NotFoundContentEx
+from app.error_models import NotFoundContentModel
 
 router = APIRouter(prefix='/services')
-
 
 @router.get(path='/main_contents', response_model=MainContentsData)
 async def main_contents(
@@ -95,64 +103,63 @@ async def main_writers(
     )
 
 
-@router.get(path='/reading_contents', response_model=ReadingContentsData)
-async def reading_contents(contents_id: int) -> ReadingContentsData:
+@router.get(path='/reading_contents',
+            response_model=ReadingContentsData,
+            responses={
+                404: {"model": NotFoundContentModel}
+            })
+async def reading_contents(contents_id: int,  session: Session = Depends(db.session)) -> ReadingContentsData:
     '''
     글읽기 페이지에서 표시되는 작품 데이터를 반환하는 API
 
     :param contents_id: 작품 식별자:
     :return ReadingContentsData:
     '''
+    # 특정 컨텐츠의 데이터를 추출하는 쿼리 작성
+    content = Content.get_by_content_id(session, contents_id)
+
+    # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
+    if(len(content) < 1):
+        raise NotFoundContentEx(contents_id=contents_id)
+
+    # 번역본 데이터를 추출하는 쿼리 작성(작성 일자로 내림차순 정렬, 원문인 경우에만 번역본 데이터 반환)
+    translated_contents_list = []
+    if(content[0].Content.original_id == -1 and content[0].Content.is_translate == 1):
+        translated_contents = Content.get_translated_contents(session, contents_id)
+        for i in range(len(translated_contents)):
+            temp = Contents()
+            temp.contents_id = translated_contents[i].Content.contents_id
+            temp.title = translated_contents[i].Content.title
+            temp.thumbnail = translated_contents[i].Content.thumbnail
+            temp.introduction = translated_contents[i].Content.introduction
+            temp.writer = Writer(writer_name=translated_contents[i].Users.user_name, writer_id=translated_contents[i].Users.user_id)
+            temp.language = translated_contents[i].Content.language
+            temp.is_translate = False
+            temp.original_id = translated_contents[i].Content.original_id
+            temp.views = translated_contents[i].Content.reviews
+            temp.translation_num = 0
+            translated_contents_list.append(temp)
+
+
     return ReadingContentsData(
         msg='응답 성공',
         data=ReadingContents(
-            contents_id=21,
-            title='장발장의 신나는 하루2',
-            thumbnail='어제 내가 왜그랬는지 도무지 이해할 수 없네',
-            introduction='장발장의 어제를 담은 이야기',
+            contents_id=content[0].Content.contents_id,
+            title=content[0].Content.title,
+            thumbnail=content[0].Content.thumbnail,
+            introduction=content[0].Content.introduction,
             writer=Writer(
-                writer_name='어제의 나',
-                writer_id='10asfg'
+                writer_name=content[0].Users.user_id,
+                writer_id=content[0].Users.user_name
             ),
-            language='한국어',
-            is_translate=False,
-            original_id=-1,
-            views=0,
-            translation_num=0,
-            contents='그때 내가 왜그랬는지 도무지 이해할 수 없네\n 배고픔이 사람을 이렇게 만들줄이야',
-            created_date=1641495600,
-            translated_contents_list=[
-                Contents(
-                    contents_id=43,
-                    title='Fun Day',
-                    thumbnail='I cant understand why I did that back then.',
-                    introduction='The Story of a Day',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='영어',
-                    is_translate=True,
-                    original_id=21,
-                    views=0,
-                    translation_num=0
-                ),
-                Contents(
-                    contents_id=43,
-                    title='Fun Day',
-                    thumbnail='I cant understand why I did that back then.',
-                    introduction='The Story of a Day',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='영어',
-                    is_translate=True,
-                    original_id=21,
-                    views=0,
-                    translation_num=0
-                )
-            ]
+            language=content[0].Content.language,
+            is_translate=True if content[0].Content.is_translate == 1 else False,
+            original_id=content[0].Content.original_id,
+            views=content[0].Content.reviews,
+            translation_num=len(translated_contents_list),
+            contents=content[0].Content.contents,
+            created_date=time.mktime(content[0].Content.updated_date.timetuple()),
+            translated_contents_list=translated_contents_list
         )
     )
 
