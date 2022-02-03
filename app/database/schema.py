@@ -3,6 +3,7 @@ from sqlalchemy import (
     String,
     func
 )
+from sqlalchemy.dialects import mysql
 
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
@@ -59,7 +60,34 @@ class UserRepository:
         return result
 
 
+class ContentRepository:
+    def __init__(self):
+        self._q = None
+        self._session = None
+        self.served = None
+
+    @classmethod
+    def get_by_content_id(cls, session: Session = None, contents_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.contents_id == contents_id).all()
+        return result
 class Users(Base, UserRepository):
     __tablename__ = "Users"
     user_id = Column(String(length=100), primary_key=True, nullable=False)
     user_name = Column(String(length=20), nullable=False)
+
+
+class Content(Base, ContentRepository):
+    __tablename__ = "Contents"
+    contents_id = Column(mysql.BIGINT(unsigned=True), primary_key=True, nullable=False)
+    writer_id = Column(mysql.VARCHAR(length=100), nullable=False)
+    contents = Column(mysql.TEXT)
+    is_translate = Column(mysql.TINYINT(unsigned=True))
+    original_id = Column(mysql.BIGINT(unsigned=True))
+    language = Column(mysql.VARCHAR(length=10))
+    created_date = Column(mysql.DATETIME)
+    title = Column(mysql.VARCHAR(length=100))
+    thumbnail = Column(mysql.VARCHAR(length=200))
+    introduction = Column(mysql.VARCHAR(length=200))
+    updated_date = Column(mysql.DATETIME)
+    reviews = Column(mysql.BIGINT)
