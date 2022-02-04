@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix='/user')
 
 from app.errors.exceptions import NotFoundUserEx, DuplicateNameEx
-from app.error_models import NotFoundUserModel
+from app.error_models import NotFoundUserModel, DuplicateNameModel
 
 
 @router.get(
@@ -41,7 +41,13 @@ async def user_info(user_id: str, session: Session = Depends(db.session)) -> Use
     )
 
 
-@router.post(path='/name_registration', response_model=UserData, status_code=status.HTTP_201_CREATED)
+@router.post(path='/name_registration',
+             response_model=UserData,
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 404: {"model": DuplicateNameModel}
+             }
+)
 async def name_registration(data: NameRegistration, session: Session = Depends(db.session)) -> UserData:
     '''
     필명 등록 페이지에서 사용자 필명 데이터를 입력받는 API
