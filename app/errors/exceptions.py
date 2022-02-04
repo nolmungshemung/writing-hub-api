@@ -76,3 +76,11 @@ class DuplicateNameEx(APIException):
             msg=f"{user_name} 이미 존재하는 필명입니다.",
             ex=ex,
         )
+
+class NotFoundContentEx(APIException):
+    def __init__(self, contents_id: int = None, ex: Exception = None):
+        super().__init__(
+            status_code=StatusCode.HTTP_404,
+            msg=f"{contents_id} 해당 작품을 찾을 수 없습니다.",
+            ex=ex,
+        )
