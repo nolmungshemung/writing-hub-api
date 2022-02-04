@@ -188,23 +188,25 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
     # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
     if(content[0].Content.original_id != -1):
         raise NotOriginalContentEx(contents_id=contents_id)
+
+    translating_count = Content.count_translated_contents(session, contents_id)
     return TranslatingContentsData(
         msg='응답 성공',
         data=TranslatingContents(
-            contents_id=21,
-            title='장발장의 신나는 하루2',
-            thumbnail='어제 내가 왜그랬는지 도무지 이해할 수 없네',
-            introduction='장발장의 어제를 담은 이야기',
+            contents_id=content[0].Content.contents_id,
+            title=content[0].Content.title,
+            thumbnail=content[0].Content.thumbnail,
+            introduction=content[0].Content.introduction,
             writer=Writer(
-                writer_name='어제의 나',
-                writer_id='10asfg'
+                writer_name=content[0].Users.user_id,
+                writer_id=content[0].Users.user_name
             ),
-            language='한국어',
-            is_translate=False,
-            original_id=-1,
-            views=0,
-            translation_num=0,
-            contents='그때 내가 왜그랬는지 도무지 이해할 수 없네\n 배고픔이 사람을 이렇게 만들줄이야'
+            language=content[0].Content.language,
+            is_translate=True if content[0].Content.is_translate == 1 else False,
+            original_id=content[0].Content.original_id,
+            views=content[0].Content.views,
+            translation_num=translating_count,
+            contents=content[0].Content.contents,
         )
     )
 
