@@ -10,8 +10,8 @@ from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel
 
 router = APIRouter(prefix='/services')
 
@@ -186,7 +186,7 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
         raise NotFoundContentEx(contents_id=contents_id)
 
     # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
-    if(content[0].Content.original_id != -1):
+    if (content[0].Content.original_id != -1):
         raise NotOriginalContentEx(contents_id=contents_id)
 
     translating_count = Content.count_translated_contents(session, contents_id)
@@ -211,8 +211,12 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
     )
 
 
-@router.get(path='/feed_contents', response_model=FeedContentsData)
-async def feed_contents(writer_id: str) -> FeedContentsData:
+@router.get(path='/feed_contents',
+            response_model=FeedContentsData,
+            responses={
+                404: {"model": NotFoundFeedContentModel}
+            })
+async def feed_contents(writer_id: str, session: Session = Depends(db.session)) -> FeedContentsData:
     '''
     피드 페이지에서 표시되는 데이터를 반환하는 API
 
@@ -221,47 +225,38 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     '''
     # 특정 유저의 데이터를 반환하는 코드 구현
     writer = Users.get(user_id=writer_id)
+
     # 특정 유저가 작성한 컨텐츠를 반환하는 코드 구현(작성 일자로 내림차순 정렬)
     feed_contents = Content.get_by_writer_id(session, writer_id)
+
+    # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
+    if (len(feed_contents) == 0):
+        raise NotFoundFeedContentEx(writer_id=writer_id)
+
+    feed_contents_list = []
+    for i in range(len(feed_contents)):
+        temp = Contents()
+        temp.contents_id = feed_contents[i].Content.contents_id
+        temp.title = feed_contents[i].Content.title
+        temp.thumbnail = feed_contents[i].Content.thumbnail
+        temp.introduction = feed_contents[i].Content.introduction
+        temp.writer = Writer(writer_name=feed_contents[i].Users.user_name,
+                             writer_id=feed_contents[i].Users.user_id)
+        temp.language = feed_contents[i].Content.language
+        temp.is_translate = True if feed_contents[i].Content.is_translate == 1 else False
+        temp.original_id = feed_contents[i].Content.original_id
+        temp.views = feed_contents[i].Content.views
+        temp.translation_num = Content.count_translated_contents(session, feed_contents[i].Content.contents_id)
+        feed_contents_list.append(temp)
+
     return FeedContentsData(
         msg='응답 성공',
         data=FeedContents(
             writer=Writer(
-                writer_name='장발장',
-                writer_id='10asff'
+                writer_name=writer.user_name,
+                writer_id=writer.user_id
             ),
-            feed_contents_list=[
-                Contents(
-                    contents_id=20,
-                    title='장발장의 신나는 하루',
-                    thumbnail='그때 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 하루를 담은 이야기',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='영어',
-                    is_translate=True,
-                    original_id=24,
-                    views=0,
-                    translation_num=0,
-                ),
-                Contents(
-                    contents_id=21,
-                    title='장발장의 신나는 하루2',
-                    thumbnail='어제 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 어제를 담은 이야기',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='한국어',
-                    is_translate=False,
-                    original_id=-1,
-                    views=0,
-                    translation_num=0,
-                )
-            ]
+            feed_contents_list=feed_contents_list
         )
     )
 
