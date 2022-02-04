@@ -172,6 +172,8 @@ async def translating_contents(contents_id: int) -> TranslatingContentsData:
     :param contents_id: 작품 식별자:
     :return TranslatingContentsData:
     '''
+    # 특정 컨텐츠의 데이터를 반환하는 코드 구현
+    content = Content.get_by_content_id(session, contents_id)
     return TranslatingContentsData(
         msg='응답 성공',
         data=TranslatingContents(
