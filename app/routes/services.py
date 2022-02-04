@@ -136,7 +136,7 @@ async def reading_contents(contents_id: int,  session: Session = Depends(db.sess
             temp.language = translated_contents[i].Content.language
             temp.is_translate = False
             temp.original_id = translated_contents[i].Content.original_id
-            temp.views = translated_contents[i].Content.reviews
+            temp.views = translated_contents[i].Content.views
             temp.translation_num = 0
             translated_contents_list.append(temp)
 
@@ -155,7 +155,7 @@ async def reading_contents(contents_id: int,  session: Session = Depends(db.sess
             language=content[0].Content.language,
             is_translate=True if content[0].Content.is_translate == 1 else False,
             original_id=content[0].Content.original_id,
-            views=content[0].Content.reviews,
+            views=content[0].Content.views,
             translation_num=len(translated_contents_list),
             contents=content[0].Content.contents,
             created_date=time.mktime(content[0].Content.updated_date.timetuple()),

@@ -99,4 +99,4 @@ class Content(Base, ContentRepository):
     thumbnail = Column(mysql.VARCHAR(length=200))
     introduction = Column(mysql.VARCHAR(length=200))
     updated_date = Column(mysql.DATETIME)
-    reviews = Column(mysql.BIGINT)
+    views = Column(mysql.BIGINT)
