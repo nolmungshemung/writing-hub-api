@@ -84,6 +84,12 @@ class ContentRepository:
         result = sess.query(Content).filter(Content.original_id == contents_id).count()
         return result
 
+    @classmethod
+    def get_by_writer_id(cls, session: Session = None, writer_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
+        return result
+
 
 
 class Users(Base, UserRepository):

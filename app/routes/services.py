@@ -221,6 +221,8 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     '''
     # 특정 유저의 데이터를 반환하는 코드 구현
     writer = Users.get(user_id=writer_id)
+    # 특정 유저가 작성한 컨텐츠를 반환하는 코드 구현(작성 일자로 내림차순 정렬)
+    feed_contents = Content.get_by_writer_id(session, writer_id)
     return FeedContentsData(
         msg='응답 성공',
         data=FeedContents(
