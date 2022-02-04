@@ -180,6 +180,11 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
     '''
     # 특정 컨텐츠의 데이터를 반환하는 코드 구현
     content = Content.get_by_content_id(session, contents_id)
+
+    # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
+    if (len(content) < 1):
+        raise NotFoundContentEx(contents_id=contents_id)
+
     # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
     if(content[0].Content.original_id != -1):
         raise NotOriginalContentEx(contents_id=contents_id)
