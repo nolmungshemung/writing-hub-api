@@ -39,3 +39,12 @@ class NotFoundContentModel(APIExceptionModel):
 
     msg: str = '해당 작품을 찾을 수 없습니다.'
     data: Dict = {}
+
+class NotOriginalContentModel(APIExceptionModel):
+    '''
+    error response schema
+    해당 식별자의 작품이 없는 경우
+    '''
+
+    msg: str = '원문이 아닙니다.'
+    data: Dict = {}

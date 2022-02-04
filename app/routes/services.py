@@ -10,10 +10,11 @@ from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx
-from app.error_models import NotFoundContentModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel
 
 router = APIRouter(prefix='/services')
+
 
 @router.get(path='/main_contents', response_model=MainContentsData)
 async def main_contents(
@@ -164,8 +165,13 @@ async def reading_contents(contents_id: int,  session: Session = Depends(db.sess
     )
 
 
-@router.get(path='/translating_contents', response_model=TranslatingContentsData)
-async def translating_contents(contents_id: int) -> TranslatingContentsData:
+@router.get(path='/translating_contents',
+            response_model=TranslatingContentsData,
+            responses={
+                404: {"model": NotFoundContentModel},
+                403: {"model": NotOriginalContentModel}
+            })
+async def translating_contents(contents_id: int, session: Session = Depends(db.session)) -> TranslatingContentsData:
     '''
     번역 페이지에서 표시되는 데이터를 반환하는 API
 
@@ -174,6 +180,9 @@ async def translating_contents(contents_id: int) -> TranslatingContentsData:
     '''
     # 특정 컨텐츠의 데이터를 반환하는 코드 구현
     content = Content.get_by_content_id(session, contents_id)
+    # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
+    if(content[0].Content.original_id != -1):
+        raise NotOriginalContentEx(contents_id=contents_id)
     return TranslatingContentsData(
         msg='응답 성공',
         data=TranslatingContents(
