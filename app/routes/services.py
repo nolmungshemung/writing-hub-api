@@ -109,7 +109,7 @@ async def main_writers(
             responses={
                 404: {"model": NotFoundContentModel}
             })
-async def reading_contents(contents_id: int,  session: Session = Depends(db.session)) -> ReadingContentsData:
+async def reading_contents(contents_id: int, session: Session = Depends(db.session)) -> ReadingContentsData:
     '''
     글읽기 페이지에서 표시되는 작품 데이터를 반환하는 API
 
@@ -120,12 +120,12 @@ async def reading_contents(contents_id: int,  session: Session = Depends(db.sess
     content = Content.get_by_content_id(session, contents_id)
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
-    if(len(content) < 1):
+    if (len(content) < 1):
         raise NotFoundContentEx(contents_id=contents_id)
 
     # 번역본 데이터를 추출하는 쿼리 작성(작성 일자로 내림차순 정렬, 원문인 경우에만 번역본 데이터 반환)
     translated_contents_list = []
-    if(content[0].Content.original_id == -1 and content[0].Content.is_translate == 1):
+    if (content[0].Content.original_id == -1 and content[0].Content.is_translate == 1):
         translated_contents = Content.get_translated_contents(session, contents_id)
         for i in range(len(translated_contents)):
             temp = Contents()
@@ -133,14 +133,14 @@ async def reading_contents(contents_id: int,  session: Session = Depends(db.sess
             temp.title = translated_contents[i].Content.title
             temp.thumbnail = translated_contents[i].Content.thumbnail
             temp.introduction = translated_contents[i].Content.introduction
-            temp.writer = Writer(writer_name=translated_contents[i].Users.user_name, writer_id=translated_contents[i].Users.user_id)
+            temp.writer = Writer(writer_name=translated_contents[i].Users.user_name,
+                                 writer_id=translated_contents[i].Users.user_id)
             temp.language = translated_contents[i].Content.language
             temp.is_translate = False
             temp.original_id = translated_contents[i].Content.original_id
             temp.views = translated_contents[i].Content.views
             temp.translation_num = 0
             translated_contents_list.append(temp)
-
 
     return ReadingContentsData(
         msg='응답 성공',
