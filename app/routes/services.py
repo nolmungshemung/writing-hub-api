@@ -219,6 +219,8 @@ async def feed_contents(writer_id: str) -> FeedContentsData:
     :param writer_id: 작가 식별자:
     :return FeedContentsData:
     '''
+    # 특정 유저의 데이터를 반환하는 코드 구현
+    writer = Users.get(user_id=writer_id)
     return FeedContentsData(
         msg='응답 성공',
         data=FeedContents(
