@@ -1,3 +1,4 @@
+import time
 from fastapi import APIRouter, Depends, status
 
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
@@ -5,18 +6,16 @@ from app.models import Contents, Writer, MainContents, MainWriters, ReadingConte
     SuccessResponse, IncreaseViews, EditingContents
 
 from app.database.conn import db
-from app.database.schema import Contents
+from app.database.schema import Content
 from sqlalchemy.orm import Session
-
-from app.errors.exceptions import NotProperWritingContentsEx
 
 from typing import Optional
 from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotProperWritingContentEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel
 
 router = APIRouter(prefix='/services')
 
@@ -269,7 +268,9 @@ async def feed_contents(writer_id: str, session: Session = Depends(db.session)) 
 @router.post(
     path='/writing_contents',
     response_model=SuccessResponse,
-    status_code=status.HTTP_201_CREATED,
+    responses={
+        400: {"model": NotFoundFeedContentModel}
+    }
 )
 async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
@@ -281,19 +282,19 @@ async def writing_contents(data: WritingContents, session: Session = Depends(db.
     '''
 
     if data.title == '':
-        raise NotProperWritingContentsEx(wrong_value='title')
+        raise NotProperWritingContentEx(wrong_value='title')
     if data.thumbnail == '':
-        raise NotProperWritingContentsEx(wrong_value='thumbnail')
+        raise NotProperWritingContentEx(wrong_value='thumbnail')
     if data.introduction == '':
-        raise NotProperWritingContentsEx(wrong_value='introduction')
+        raise NotProperWritingContentEx(wrong_value='introduction')
     if data.contents == '':
-        raise NotProperWritingContentsEx(wrong_value='contents')
+        raise NotProperWritingContentEx(wrong_value='contents')
     if data.writer_id == '':
-        raise NotProperWritingContentsEx(wrong_value='writer_id')
+        raise NotProperWritingContentEx(wrong_value='writer_id')
     if data.language == '':
-        raise NotProperWritingContentsEx(wrong_value='language')
+        raise NotProperWritingContentEx(wrong_value='language')
 
-    Contents.create_contents(session, data)
+    Content.create_contents(session, data)
     return SuccessResponse(
         msg='요청 성공',
         data={}

@@ -62,11 +62,11 @@ class NotFoundFeedContentModel(APIExceptionModel):
     data: Dict = {}
 
 
-class NotProperWritingContents(WritingContents):
+class NotProperWritingContentModel(APIExceptionModel):
     '''
     error response schema
     If WritingContents values were not proper
     '''
 
-    msg: str = 'WritingContents were not proper'
+    msg: str = '컨텐츠의 내용이 올바르지 않습니다.'
     data: Dict = {}
