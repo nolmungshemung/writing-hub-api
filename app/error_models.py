@@ -62,9 +62,6 @@ class NotFoundFeedContentModel(APIExceptionModel):
     data: Dict = {}
 
 
-
-
-
 class NotProperWritingContents(WritingContents):
     '''
     error response schema
