@@ -8,7 +8,6 @@ from app.database.schema import Contents
 from sqlalchemy.orm import Session
 
 from app.errors.exceptions import NotProperWritingContentsEx
-from app.error_models import NotProperWritingContentsModel
 
 from typing import Optional
 
