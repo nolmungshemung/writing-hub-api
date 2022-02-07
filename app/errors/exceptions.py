@@ -78,7 +78,7 @@ class DuplicateNameEx(APIException):
             ex=ex,
         )
 
-
+        
 class NotFoundContentsEx(APIException):
     def __init__(self, contents_id: str = None, ex: Exception = None):
         super().__init__(
@@ -86,7 +86,6 @@ class NotFoundContentsEx(APIException):
             msg=f"{contents_id} 해당 컨텐츠를 찾을 수 없습니다.",
             ex=ex,
         )
-
 
 class NotProperWritingContentsEx(APIException):
     def __init__(self, wrong_value: str = None, ex: Exception = None):

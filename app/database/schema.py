@@ -3,6 +3,7 @@ from sqlalchemy import (
     String,
     func,
 )
+from sqlalchemy.dialects import mysql
 
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm import Session, relationship
@@ -59,6 +60,38 @@ class UserRepository:
         sess = next(db.session()) if not session else session
         result = sess.query(Users).filter(Users.user_name == user_name).count()
         return result
+
+
+class ContentRepository:
+    def __init__(self):
+        self._q = None
+        self._session = None
+        self.served = None
+
+    @classmethod
+    def get_by_content_id(cls, session: Session = None, contents_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.contents_id == contents_id).all()
+        return result
+
+    @classmethod
+    def get_translated_contents(cls, session: Session = None, contents_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.original_id == contents_id).order_by(Content.updated_date.desc()).all()
+        return result
+
+    @classmethod
+    def count_translated_contents(cls, session: Session = None, contents_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content).filter(Content.original_id == contents_id).count()
+        return result
+
+    @classmethod
+    def get_by_writer_id(cls, session: Session = None, writer_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
+        return result
+
 
 
 class Users(Base, UserRepository):
