@@ -51,22 +51,7 @@ async def main_contents(
                     original_id=24,
                     views=0,
                     translation_num=0
-                ),
-                Contents(
-                    contents_id=21,
-                    title='장발장의 신나는 하루2',
-                    thumbnail='어제 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 어제를 담은 이야기',
-                    writer=Writer(
-                        writer_name='어제의 나',
-                        writer_id='10asfg'
-                    ),
-                    language='한국어',
-                    is_translate=False,
-                    original_id=-1,
-                    views=0,
-                    translation_num=0
-                )
+                ) for _ in range(count)
             ]
         )
     )
@@ -94,11 +79,7 @@ async def main_writers(
                 Writer(
                     writer_name='장발장',
                     writer_id='10asff'
-                ),
-                Writer(
-                    writer_name='어제의 나',
-                    writer_id='10asfg'
-                )
+                ) for _ in range(count)
             ]
         )
     )
