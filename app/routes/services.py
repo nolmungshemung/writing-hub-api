@@ -269,7 +269,7 @@ async def feed_contents(writer_id: str, session: Session = Depends(db.session)) 
     path='/writing_contents',
     response_model=SuccessResponse,
     responses={
-        400: {"model": NotFoundFeedContentModel}
+        400: {"model": NotProperWritingContentModel}
     }
 )
 async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:

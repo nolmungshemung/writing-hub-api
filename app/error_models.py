@@ -65,7 +65,7 @@ class NotFoundFeedContentModel(APIExceptionModel):
 class NotProperWritingContentModel(APIExceptionModel):
     '''
     error response schema
-    If WritingContents values were not proper
+    컨텐츠의 값들이 올바르지 않은 경우
     '''
 
     msg: str = '컨텐츠의 내용이 올바르지 않습니다.'
