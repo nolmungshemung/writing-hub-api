@@ -57,26 +57,15 @@ async def main_contents(
     next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start+count, count)
     if next_contents.rowcount > 0:
         is_last = True
+
     return MainContentsData(
         msg='응답 성공',
         data=MainContents(
-            main_contents_list=[
-                Contents(
-                    contents_id=20,
-                    title='장발장의 신나는 하루',
-                    thumbnail='그때 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 하루를 담은 이야기',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='영어',
-                    is_translate=True,
-                    original_id=24,
-                    views=0,
-                    translation_num=0
-                ) for _ in range(count)
-            ]
+            main_contents_list=main_contents_list,
+            paging=Paging(
+                start=start,
+                is_last=is_last,
+            )
         )
     )
 
