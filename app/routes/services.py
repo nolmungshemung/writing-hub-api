@@ -131,8 +131,8 @@ async def reading_contents(contents_id: int, session: Session = Depends(db.sessi
             thumbnail=content[0].Content.thumbnail,
             introduction=content[0].Content.introduction,
             writer=Writer(
-                writer_name=content[0].Users.user_id,
-                writer_id=content[0].Users.user_name
+                writer_name=content[0].Users.user_name,
+                writer_id=content[0].Users.user_id
             ),
             language=content[0].Content.language,
             is_translate=True if content[0].Content.is_translate == 1 else False,
