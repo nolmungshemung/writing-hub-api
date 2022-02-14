@@ -100,3 +100,11 @@ class NotFoundFeedContentEx(APIException):
             msg=f"{writer_id} 작가의 작품을 찾을 수 없습니다.",
             ex=ex,
         )
+
+class NotFoundMainWritersEx(APIException):
+    def __init__(self, ex: Exception = None):
+        super().__init__(
+            status_code=StatusCode.HTTP_404,
+            msg="작가의 작품을 찾을 수 없습니다.",
+            ex=ex,
+        )
