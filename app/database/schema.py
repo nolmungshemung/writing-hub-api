@@ -1,12 +1,13 @@
+import sqlalchemy.sql.functions
 from sqlalchemy import (
     Column,
     String,
     func
 )
 from sqlalchemy.dialects import mysql
-
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
+from app.models import EditingContents
 
 
 class UserRepository:
@@ -90,6 +91,21 @@ class ContentRepository:
         result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
         return result
 
+    @classmethod
+    def editing_contents(cls, session: Session = None, editing_content: EditingContents = None):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content).filter(Content.contents_id == editing_content.contents_id).update(
+            {
+                'contents': editing_content.contents,
+                'is_translate': editing_content.is_translate,
+                'original_id': editing_content.original_id,
+                'language': editing_content.language,
+                'title': editing_content.title,
+                'thumbnail': editing_content.thumbnail,
+                'introduction': editing_content.introduction
+             }
+        )
+        sess.commit()
 
 
 class Users(Base, UserRepository):
