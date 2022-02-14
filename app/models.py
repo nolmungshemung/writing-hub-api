@@ -102,6 +102,7 @@ class MainWriters(BaseModel):
     '''
 
     main_writer_list: List[Writer]
+    paging: Paging = {}
 
 
 class MainWritersData(SuccessResponse):
