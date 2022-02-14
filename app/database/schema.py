@@ -60,6 +60,20 @@ class UserRepository:
         result = sess.query(Users).filter(Users.user_name == user_name).count()
         return result
 
+    @classmethod
+    def get_main_writer(cls, session: Session = None, user_name='', start=0, count=10):
+        sess = next(db.session()) if not session else session
+        sql = text("SELECT U.user_id as user_id, U.user_name as user_name, count(C.writer_id) as count"
+                   + " FROM Users U LEFT JOIN Contents C on U.user_id = C.writer_id"
+                   + " WHERE 1=1"
+                   + " AND replace(U.user_name, ' ', '') like '%" + user_name + "%'"
+                   + " GROUP BY U.user_id, U.user_name"
+                   + " ORDER BY count(U.user_id) DESC"
+                   + " LIMIT " + "{}".format(count)
+                   + " OFFSET " + "{}".format(start))
+
+        result = sess.execute(sql)
+        return result
 
 class ContentRepository:
     def __init__(self):
