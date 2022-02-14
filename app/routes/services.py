@@ -16,7 +16,11 @@ from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotF
 router = APIRouter(prefix='/services')
 
 
-@router.get(path='/main_contents', response_model=MainContentsData)
+@router.get(path='/main_contents',
+            response_model=MainContentsData,
+            responses={
+                404: {"model": NotFoundContentModel}
+            })
 async def main_contents(
         start: int = 0,
         count: int = 10,
@@ -52,9 +56,12 @@ async def main_contents(
         temp.translation_num = content.count
         main_contents_list.append(temp)
 
+    if(len(main_contents_list) < 1):
+        raise NotFoundContentEx()
+
     # is_last 로직 작성
     is_last = False
-    next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start+count, count)
+    next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start + count, count)
     if next_contents.rowcount > 0:
         is_last = True
 
@@ -115,7 +122,7 @@ async def reading_contents(contents_id: int, session: Session = Depends(db.sessi
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(content) < 1):
-        raise NotFoundContentEx(contents_id=contents_id)
+        raise NotFoundContentEx()
 
     # 번역본 데이터를 추출하는 쿼리 작성(작성 일자로 내림차순 정렬, 원문인 경우에만 번역본 데이터 반환)
     translated_contents_list = []
@@ -177,7 +184,7 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(content) < 1):
-        raise NotFoundContentEx(contents_id=contents_id)
+        raise NotFoundContentEx()
 
     # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
     if (content[0].Content.original_id != -1):
