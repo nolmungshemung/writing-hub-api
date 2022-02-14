@@ -82,7 +82,8 @@ async def main_writers(
         start: int = 0,
         count: int = 10,
         base_time: int = 0,
-        keyword: Optional[str] = None
+        keyword: Optional[str] = '',
+        session: Session = Depends(db.session)
 ) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
@@ -92,6 +93,15 @@ async def main_writers(
     :param keyword: 검색어:
     :return MainWritersData:
     '''
+
+    main_writer_list = []
+    users = Users.get_main_writer(session, keyword.replace(" ", ""), start, count)
+    for user in users:
+        print(user)
+        temp = Writer()
+        temp.writer_name = user.user_name
+        temp.writer_id = user.user_id
+        main_writer_list.append(temp)
     return MainWritersData(
         msg='응답 성공',
         data=MainWriters(
