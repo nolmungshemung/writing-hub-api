@@ -120,12 +120,11 @@ async def main_writers(
     return MainWritersData(
         msg='응답 성공',
         data=MainWriters(
-            main_writer_list=[
-                Writer(
-                    writer_name='장발장',
-                    writer_id='10asff'
-                ) for _ in range(count)
-            ]
+            main_writer_list=main_writer_list,
+            paging=Paging(
+                start=start,
+                is_last=is_last,
+            )
         )
     )
 
