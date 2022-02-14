@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
-    SuccessResponse, IncreaseViews, EditingContents
+    SuccessResponse, IncreaseViews, EditingContents, Paging
 from typing import Optional
 from app.database.conn import db
 from app.database.schema import Content, Users
@@ -21,7 +21,8 @@ async def main_contents(
         start: int = 0,
         count: int = 10,
         base_time: int = 0,
-        keyword: Optional[str] = None
+        keyword: Optional[str] = '',
+        session: Session = Depends(db.session)
 ) -> MainContentsData:
     '''
     메인 페이지에서 표시되는 작품 데이터를 반환하는 API
@@ -33,6 +34,29 @@ async def main_contents(
     :return MainContentsData:
     '''
 
+    main_contents_list = []
+    contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start, count)
+    for content in contents:
+        print(content)
+        temp = Contents()
+        temp.contents_id = content.contents_id
+        temp.title = content.title
+        temp.thumbnail = content.thumbnail
+        temp.introduction = content.introduction
+        temp.writer = Writer(writer_name=content.user_name,
+                             writer_id=content.user_id)
+        temp.language = content.language
+        temp.is_translate = content.is_translate
+        temp.original_id = content.original_id
+        temp.views = content.views
+        temp.translation_num = content.count
+        main_contents_list.append(temp)
+
+    # is_last 로직 작성
+    is_last = False
+    next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start+count, count)
+    if next_contents.rowcount > 0:
+        is_last = True
     return MainContentsData(
         msg='응답 성공',
         data=MainContents(
