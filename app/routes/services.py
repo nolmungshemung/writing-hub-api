@@ -10,8 +10,9 @@ from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotFoundMainWritersEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, \
+    NotFoundMainWritersModel
 
 router = APIRouter(prefix='/services')
 
@@ -77,7 +78,11 @@ async def main_contents(
     )
 
 
-@router.get(path='/main_writers', response_model=MainWritersData)
+@router.get(path='/main_writers',
+            response_model=MainWritersData,
+            responses={
+                404: {"model": NotFoundMainWritersModel}
+            })
 async def main_writers(
         start: int = 0,
         count: int = 10,
@@ -102,6 +107,10 @@ async def main_writers(
         temp.writer_name = user.user_name
         temp.writer_id = user.user_id
         main_writer_list.append(temp)
+
+    if(len(main_writer_list) < 1):
+        raise NotFoundMainWritersEx()
+
     return MainWritersData(
         msg='응답 성공',
         data=MainWriters(
