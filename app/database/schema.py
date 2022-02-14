@@ -1,7 +1,8 @@
 from sqlalchemy import (
     Column,
     String,
-    func
+    func,
+    text
 )
 from sqlalchemy.dialects import mysql
 
@@ -87,9 +88,25 @@ class ContentRepository:
     @classmethod
     def get_by_writer_id(cls, session: Session = None, writer_id=''):
         sess = next(db.session()) if not session else session
-        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(
+            Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
         return result
 
+    @classmethod
+    def get_by_title(cls, session: Session = None, title='', base_time=0, start=0, count=10):
+        sess = next(db.session()) if not session else session
+        sql = text("SELECT c.*, U.*, cc.count"
+                   + " FROM Contents as c LEFT JOIN Users U on c.writer_id = U.user_id"
+                   + " LEFT JOIN (SELECT c.contents_id, count(c.contents_id) as count FROM Contents as c LEFT JOIN Contents cc ON c.contents_id = cc.original_id GROUP BY c.contents_id) cc ON c.contents_id = cc.contents_id "
+                   + " WHERE 1=1"
+                   + " AND replace(c.title, ' ', '') like '%" + title + "%'"
+                   + " AND UNIX_TIMESTAMP(c.created_date) >=" + "{}".format(base_time)
+                   + " ORDER BY c.updated_date DESC"
+                   + " LIMIT " + "{}".format(count)
+                   + " OFFSET " + "{}".format(start))
+
+        result = sess.execute(sql)
+        return result
 
 
 class Users(Base, UserRepository):
