@@ -256,15 +256,20 @@ async def writing_contents(data: WritingContents) -> SuccessResponse:
         data={}
     )
 
-
 @router.post(path='/editing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def editing_contents(data: EditingContents) -> SuccessResponse:
+async def editing_contents(data: EditingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글수정 페이지에서 작성한 작품 데이터를 입력받는 API
 
     :param data: 작품 데이터:
     :return SuccessResponse:
     '''
+    content = Content.get_by_content_id(session, data.contents_id)
+    if (len(content) < 1):
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.editing_contents(session, data)
+
     print(data)
     return SuccessResponse(
         msg='요청 성공',
