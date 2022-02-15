@@ -345,7 +345,7 @@ async def editing_contents(data: EditingContents, session: Session = Depends(db.
     path='/increase_views',
     response_model=SuccessResponse,
     responses={
-        404: {"model": NotFoundContents}
+        404: {"model": NotFoundContentModel}
     }
 )
 async def IncreaseContentViews(data: IncreaseViews, session: Session = Depends(db.session)) -> SuccessResponse:
@@ -355,11 +355,11 @@ async def IncreaseContentViews(data: IncreaseViews, session: Session = Depends(d
     :param data: 작품 직별자:
     :return SuccessResponse:
     '''
-    count = Contents.count_by_contents_id(session, data.contents_id)
+    count = Content.count_by_contents_id(session, data.contents_id)
     if count < 1:
-        raise NotFoundContentsEx(contents_id=data.contents_id)
+        raise NotFoundContentEx(contents_id=data.contents_id)
 
-    Contents.increase_content_views(session, data.contents_id)
+    Content.increase_content_views(session, data.contents_id)
 
     return SuccessResponse(
         msg='요청 성공',

@@ -170,16 +170,16 @@ class ContentRepository:
     @classmethod
     def count_by_contents_id(cls, session: Session = None, contents_id=''):
         sess = next(db.session()) if not session else session
-        result = sess.query(Contents).filter(Contents.contents_id == contents_id).count()
+        result = sess.query(Content).filter(Content.contents_id == contents_id).count()
         return result
 
     @classmethod
     def increase_content_views(cls, session: Session = None, contents_id=''):
-        content = session.query(Contents).filter(Contents.contents_id == contents_id).one()
+        content = session.query(Content).filter(Content.contents_id == contents_id).one()
         print(type(content.views))
         value_views = content.views
         value_views += 1
-        session.query(Contents).filter(Contents.contents_id == contents_id).update({'views': value_views})
+        session.query(Content).filter(Content.contents_id == contents_id).update({'views': value_views})
         session.commit()
 
 
