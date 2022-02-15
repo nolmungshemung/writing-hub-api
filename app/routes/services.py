@@ -3,29 +3,31 @@ from fastapi import APIRouter, Depends, status
 
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
-    SuccessResponse, IncreaseViews, EditingContents
-
-from app.database.conn import db
-from app.database.schema import Content
-from sqlalchemy.orm import Session
+    SuccessResponse, IncreaseViews, EditingContents, Paging
 
 from typing import Optional
 from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotProperWritingContentEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotFoundMainWritersEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel\
+    NotFoundMainWritersModel
 
 router = APIRouter(prefix='/services')
 
 
-@router.get(path='/main_contents', response_model=MainContentsData)
+@router.get(path='/main_contents',
+            response_model=MainContentsData,
+            responses={
+                404: {"model": NotFoundContentModel}
+            })
 async def main_contents(
         start: int = 0,
         count: int = 10,
         base_time: int = 0,
-        keyword: Optional[str] = None
+        keyword: Optional[str] = '',
+        session: Session = Depends(db.session)
 ) -> MainContentsData:
     '''
     메인 페이지에서 표시되는 작품 데이터를 반환하는 API
@@ -37,51 +39,56 @@ async def main_contents(
     :return MainContentsData:
     '''
 
+    main_contents_list = []
+    contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start, count)
+    for content in contents:
+        print(content)
+        temp = Contents()
+        temp.contents_id = content.contents_id
+        temp.title = content.title
+        temp.thumbnail = content.thumbnail
+        temp.introduction = content.introduction
+        temp.writer = Writer(writer_name=content.user_name,
+                             writer_id=content.user_id)
+        temp.language = content.language
+        temp.is_translate = content.is_translate
+        temp.original_id = content.original_id
+        temp.views = content.views
+        temp.translation_num = content.count
+        main_contents_list.append(temp)
+
+    if(len(main_contents_list) < 1):
+        raise NotFoundContentEx()
+
+    # is_last 로직 작성
+    is_last = False
+    next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start + count, count)
+    if next_contents.rowcount > 0:
+        is_last = True
+
     return MainContentsData(
         msg='응답 성공',
         data=MainContents(
-            main_contents_list=[
-                Contents(
-                    contents_id=20,
-                    title='장발장의 신나는 하루',
-                    thumbnail='그때 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 하루를 담은 이야기',
-                    writer=Writer(
-                        writer_name='장발장',
-                        writer_id='10asff'
-                    ),
-                    language='영어',
-                    is_translate=True,
-                    original_id=24,
-                    views=0,
-                    translation_num=0
-                ),
-                Contents(
-                    contents_id=21,
-                    title='장발장의 신나는 하루2',
-                    thumbnail='어제 내가 왜그랬는지 도무지 이해할 수 없네',
-                    introduction='장발장의 어제를 담은 이야기',
-                    writer=Writer(
-                        writer_name='어제의 나',
-                        writer_id='10asfg'
-                    ),
-                    language='한국어',
-                    is_translate=False,
-                    original_id=-1,
-                    views=0,
-                    translation_num=0
-                )
-            ]
+            main_contents_list=main_contents_list,
+            paging=Paging(
+                start=start,
+                is_last=is_last,
+            )
         )
     )
 
 
-@router.get(path='/main_writers', response_model=MainWritersData)
+@router.get(path='/main_writers',
+            response_model=MainWritersData,
+            responses={
+                404: {"model": NotFoundMainWritersModel}
+            })
 async def main_writers(
         start: int = 0,
         count: int = 10,
         base_time: int = 0,
-        keyword: Optional[str] = None
+        keyword: Optional[str] = '',
+        session: Session = Depends(db.session)
 ) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
@@ -91,19 +98,33 @@ async def main_writers(
     :param keyword: 검색어:
     :return MainWritersData:
     '''
+
+    main_writer_list = []
+    users = Users.get_main_writer(session, keyword.replace(" ", ""), start, count)
+    for user in users:
+        print(user)
+        temp = Writer()
+        temp.writer_name = user.user_name
+        temp.writer_id = user.user_id
+        main_writer_list.append(temp)
+
+    if(len(main_writer_list) < 1):
+        raise NotFoundMainWritersEx()
+
+    # is_last 로직 작성
+    is_last = False
+    next_users = Users.get_main_writer(session, keyword.replace(" ", ""), start + count, count)
+    if next_users.rowcount > 0:
+        is_last = True
+
     return MainWritersData(
         msg='응답 성공',
         data=MainWriters(
-            main_writer_list=[
-                Writer(
-                    writer_name='장발장',
-                    writer_id='10asff'
-                ),
-                Writer(
-                    writer_name='어제의 나',
-                    writer_id='10asfg'
-                )
-            ]
+            main_writer_list=main_writer_list,
+            paging=Paging(
+                start=start,
+                is_last=is_last,
+            )
         )
     )
 
@@ -125,7 +146,7 @@ async def reading_contents(contents_id: int, session: Session = Depends(db.sessi
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(content) < 1):
-        raise NotFoundContentEx(contents_id=contents_id)
+        raise NotFoundContentEx()
 
     # 번역본 데이터를 추출하는 쿼리 작성(작성 일자로 내림차순 정렬, 원문인 경우에만 번역본 데이터 반환)
     translated_contents_list = []
@@ -154,8 +175,8 @@ async def reading_contents(contents_id: int, session: Session = Depends(db.sessi
             thumbnail=content[0].Content.thumbnail,
             introduction=content[0].Content.introduction,
             writer=Writer(
-                writer_name=content[0].Users.user_id,
-                writer_id=content[0].Users.user_name
+                writer_name=content[0].Users.user_name,
+                writer_id=content[0].Users.user_id
             ),
             language=content[0].Content.language,
             is_translate=True if content[0].Content.is_translate == 1 else False,
@@ -187,7 +208,7 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(content) < 1):
-        raise NotFoundContentEx(contents_id=contents_id)
+        raise NotFoundContentEx()
 
     # 번역하고자하는 컨텐츠가 원문인지 확인하는 기능 구현(원문이 아닌 경우 403 code와 msg 반환)
     if (content[0].Content.original_id != -1):
@@ -300,15 +321,20 @@ async def writing_contents(data: WritingContents, session: Session = Depends(db.
         data={}
     )
 
-
 @router.post(path='/editing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def editing_contents(data: EditingContents) -> SuccessResponse:
+async def editing_contents(data: EditingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글수정 페이지에서 작성한 작품 데이터를 입력받는 API
 
     :param data: 작품 데이터:
     :return SuccessResponse:
     '''
+    content = Content.get_by_content_id(session, data.contents_id)
+    if (len(content) < 1):
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.editing_contents(session, data)
+
     print(data)
     return SuccessResponse(
         msg='요청 성공',

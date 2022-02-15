@@ -1,14 +1,14 @@
+import sqlalchemy.sql.functions
 from sqlalchemy import (
     Column,
     String,
     func,
+    text
 )
-from sqlalchemy.dialects import mysql
-
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
-from app.models import WritingContents
+from app.models import EditingContents
 
 
 class UserRepository:
@@ -61,6 +61,20 @@ class UserRepository:
         result = sess.query(Users).filter(Users.user_name == user_name).count()
         return result
 
+    @classmethod
+    def get_main_writer(cls, session: Session = None, user_name='', start=0, count=10):
+        sess = next(db.session()) if not session else session
+        sql = text("SELECT U.user_id as user_id, U.user_name as user_name, count(C.writer_id) as count"
+                   + " FROM Users U LEFT JOIN Contents C on U.user_id = C.writer_id"
+                   + " WHERE 1=1"
+                   + " AND replace(U.user_name, ' ', '') like '%" + user_name + "%'"
+                   + " GROUP BY U.user_id, U.user_name"
+                   + " ORDER BY count(U.user_id) DESC"
+                   + " LIMIT " + "{}".format(count)
+                   + " OFFSET " + "{}".format(start))
+
+        result = sess.execute(sql)
+        return result
 
 class ContentRepository:
     def __init__(self):
@@ -89,9 +103,43 @@ class ContentRepository:
     @classmethod
     def get_by_writer_id(cls, session: Session = None, writer_id=''):
         sess = next(db.session()) if not session else session
-        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
+        result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(
+            Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
         return result
 
+    @classmethod
+    def editing_contents(cls, session: Session = None, editing_content: EditingContents = None):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content).filter(Content.contents_id == editing_content.contents_id).update(
+            {
+                'contents': editing_content.contents,
+                'is_translate': editing_content.is_translate,
+                'original_id': editing_content.original_id,
+                'language': editing_content.language,
+                'title': editing_content.title,
+                'thumbnail': editing_content.thumbnail,
+                'introduction': editing_content.introduction
+             }
+        )
+        sess.commit()
+
+    @classmethod
+    def get_by_title(cls, session: Session = None, title='', base_time=0, start=0, count=10):
+        sess = next(db.session()) if not session else session
+        sql = text("SELECT c.*, U.*, cc.count"
+                   + " FROM Contents as c LEFT JOIN Users U on c.writer_id = U.user_id"
+                   + " LEFT JOIN (SELECT c.contents_id, count(c.contents_id) as count FROM Contents as c LEFT JOIN Contents cc ON c.contents_id = cc.original_id GROUP BY c.contents_id) cc ON c.contents_id = cc.contents_id "
+                   + " WHERE 1=1"
+                   + " AND replace(c.title, ' ', '') like '%" + title + "%'"
+                   + " AND UNIX_TIMESTAMP(c.created_date) >=" + "{}".format(base_time)
+                   + " ORDER BY c.updated_date DESC"
+                   + " LIMIT " + "{}".format(count)
+                   + " OFFSET " + "{}".format(start))
+
+        result = sess.execute(sql)
+        return result
+      
+      
 class Users(Base, UserRepository):
     __tablename__ = "Users"
     user_id = Column(String(length=100), primary_key=True, nullable=False)

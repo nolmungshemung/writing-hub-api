@@ -105,7 +105,6 @@ class NotFoundFeedContentEx(APIException):
             ex=ex,
         )
 
-
 class NotProperWritingContentEx(APIException):
     def __init__(self, wrong_value: str = None, ex: Exception = None):
         super().__init__(

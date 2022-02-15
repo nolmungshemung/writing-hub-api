@@ -53,6 +53,16 @@ class Contents(BaseModel):
     views: int = 0
     translation_num: int = 0
 
+class Paging(BaseModel):
+    '''
+    페이징 데이터
+
+    start: 가져오려는 데이터 시작점
+    is_last: 추가로 반환할 데이터가 있으면 True, 없으면 False
+    '''
+
+    start: int = 0
+    is_last: bool = False
 
 class MainContents(BaseModel):
     '''
@@ -62,6 +72,7 @@ class MainContents(BaseModel):
     '''
 
     main_contents_list: List[Contents] = []
+    paging: Paging = {}
 
 
 class MainContentsData(SuccessResponse):
@@ -91,6 +102,7 @@ class MainWriters(BaseModel):
     '''
 
     main_writer_list: List[Writer]
+    paging: Paging = {}
 
 
 class MainWritersData(SuccessResponse):

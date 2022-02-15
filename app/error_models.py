@@ -70,3 +70,12 @@ class NotProperWritingContentModel(APIExceptionModel):
 
     msg: str = '컨텐츠의 내용이 올바르지 않습니다.'
     data: Dict = {}
+
+class NotFoundMainWritersModel(APIExceptionModel):
+    '''
+    error response schema
+    메인 페이지의 작가가 없는 경우
+    '''
+
+    msg: str = '작가를 찾을 수 없습니다.'
+    data: Dict = {}
