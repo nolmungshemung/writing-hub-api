@@ -78,10 +78,10 @@ class DuplicateNameEx(APIException):
         )
 
 class NotFoundContentEx(APIException):
-    def __init__(self, contents_id: int = None, ex: Exception = None):
+    def __init__(self, ex: Exception = None):
         super().__init__(
             status_code=StatusCode.HTTP_404,
-            msg=f"{contents_id} 해당 작품을 찾을 수 없습니다.",
+            msg=f"해당 작품을 찾을 수 없습니다.",
             ex=ex,
         )
 
@@ -98,5 +98,13 @@ class NotFoundFeedContentEx(APIException):
         super().__init__(
             status_code=StatusCode.HTTP_404,
             msg=f"{writer_id} 작가의 작품을 찾을 수 없습니다.",
+            ex=ex,
+        )
+
+class NotFoundMainWritersEx(APIException):
+    def __init__(self, ex: Exception = None):
+        super().__init__(
+            status_code=StatusCode.HTTP_404,
+            msg="작가의 작품을 찾을 수 없습니다.",
             ex=ex,
         )

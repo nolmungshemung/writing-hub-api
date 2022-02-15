@@ -57,3 +57,13 @@ class NotFoundFeedContentModel(APIExceptionModel):
 
     msg: str = '작가의 작품을 찾을 수 없습니다.'
     data: Dict = {}
+
+
+class NotFoundMainWritersModel(APIExceptionModel):
+    '''
+    error response schema
+    메인 페이지의 작가가 없는 경우
+    '''
+
+    msg: str = '작가를 찾을 수 없습니다.'
+    data: Dict = {}
