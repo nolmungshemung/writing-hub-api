@@ -10,9 +10,8 @@ from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotFoundMainWritersEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel\
-    NotFoundMainWritersModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel, NotFoundMainWritersModel
 
 router = APIRouter(prefix='/services')
 

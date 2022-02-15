@@ -8,7 +8,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm import Session, relationship
 from app.database.conn import Base, db
-from app.models import EditingContents
+from app.models import EditingContents, WritingContents
 
 
 class UserRepository:
