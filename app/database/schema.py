@@ -131,8 +131,8 @@ class ContentRepository:
                    + " LEFT JOIN (SELECT c.contents_id, count(c.contents_id) as count FROM Contents as c LEFT JOIN Contents cc ON c.contents_id = cc.original_id GROUP BY c.contents_id) cc ON c.contents_id = cc.contents_id "
                    + " WHERE 1=1"
                    + " AND replace(c.title, ' ', '') like '%" + title + "%'"
-                   + " AND UNIX_TIMESTAMP(c.created_date) >=" + "{}".format(base_time)
-                   + " ORDER BY c.updated_date DESC"
+                   + " AND UNIX_TIMESTAMP(c.created_date) <=" + "{}".format(base_time)
+                   + " ORDER BY c.created_date DESC"
                    + " LIMIT " + "{}".format(count)
                    + " OFFSET " + "{}".format(start))
 
