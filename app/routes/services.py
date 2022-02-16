@@ -1,17 +1,17 @@
 import time
-
 from fastapi import APIRouter, Depends, status
 
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews, EditingContents, Paging
+
 from typing import Optional
 from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
 from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel, NotFoundMainWritersModel
 
 router = APIRouter(prefix='/services')
 
@@ -77,12 +77,17 @@ async def main_contents(
     )
 
 
-@router.get(path='/main_writers', response_model=MainWritersData)
+@router.get(path='/main_writers',
+            response_model=MainWritersData,
+            responses={
+                404: {"model": NotFoundMainWritersModel}
+            })
 async def main_writers(
         start: int = 0,
         count: int = 10,
         base_time: int = 0,
-        keyword: Optional[str] = None
+        keyword: Optional[str] = '',
+        session: Session = Depends(db.session)
 ) -> MainWritersData:
     '''
     메인 페이지에서 표시되는 작가 데이터를 반환하는 API
@@ -92,15 +97,33 @@ async def main_writers(
     :param keyword: 검색어:
     :return MainWritersData:
     '''
+
+    main_writer_list = []
+    users = Users.get_main_writer(session, keyword.replace(" ", ""), base_time, start, count)
+    for user in users:
+        print(user)
+        temp = Writer()
+        temp.writer_name = user.user_name
+        temp.writer_id = user.user_id
+        main_writer_list.append(temp)
+
+    if(len(main_writer_list) < 1):
+        raise NotFoundMainWritersEx()
+
+    # is_last 로직 작성
+    is_last = False
+    next_users = Users.get_main_writer(session, keyword.replace(" ", ""), base_time, start + count, count)
+    if next_users.rowcount > 0:
+        is_last = True
+
     return MainWritersData(
         msg='응답 성공',
         data=MainWriters(
-            main_writer_list=[
-                Writer(
-                    writer_name='장발장',
-                    writer_id='10asff'
-                ) for _ in range(count)
-            ]
+            main_writer_list=main_writer_list,
+            paging=Paging(
+                start=start,
+                is_last=is_last,
+            )
         )
     )
 
@@ -262,29 +285,55 @@ async def feed_contents(writer_id: str, session: Session = Depends(db.session)) 
     )
 
 
-@router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def writing_contents(data: WritingContents) -> SuccessResponse:
+@router.post(
+    path='/writing_contents',
+    response_model=SuccessResponse,
+    responses={
+        400: {"model": NotProperWritingContentModel}
+    }
+)
+async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
 
-    :param data: 작품 데이터:
+    :param data: 작품 데이터:\n
+    :param session: DB 세션:\n
     :return SuccessResponse:
     '''
-    print(data)
+
+    if data.title == '':
+        raise NotProperWritingContentEx(wrong_value='title')
+    if data.thumbnail == '':
+        raise NotProperWritingContentEx(wrong_value='thumbnail')
+    if data.introduction == '':
+        raise NotProperWritingContentEx(wrong_value='introduction')
+    if data.contents == '':
+        raise NotProperWritingContentEx(wrong_value='contents')
+    if data.writer_id == '':
+        raise NotProperWritingContentEx(wrong_value='writer_id')
+    if data.language == '':
+        raise NotProperWritingContentEx(wrong_value='language')
+
+    Content.create_contents(session, data)
     return SuccessResponse(
         msg='요청 성공',
         data={}
     )
 
-
 @router.post(path='/editing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def editing_contents(data: EditingContents) -> SuccessResponse:
+async def editing_contents(data: EditingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글수정 페이지에서 작성한 작품 데이터를 입력받는 API
 
     :param data: 작품 데이터:
     :return SuccessResponse:
     '''
+    content = Content.get_by_content_id(session, data.contents_id)
+    if (len(content) < 1):
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.editing_contents(session, data)
+
     print(data)
     return SuccessResponse(
         msg='요청 성공',
@@ -292,15 +341,26 @@ async def editing_contents(data: EditingContents) -> SuccessResponse:
     )
 
 
-@router.post(path='/increase_views', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def increase_views(data: IncreaseViews) -> SuccessResponse:
+@router.post(
+    path='/increase_views',
+    response_model=SuccessResponse,
+    responses={
+        404: {"model": NotFoundContentModel}
+    }
+)
+async def IncreaseContentViews(data: IncreaseViews, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     작품 조회수 카운트를 위한 API
 
     :param data: 작품 직별자:
     :return SuccessResponse:
     '''
-    print(data)
+    count = Content.count_by_contents_id(session, data.contents_id)
+    if count < 1:
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.increase_content_views(session, data.contents_id)
+
     return SuccessResponse(
         msg='요청 성공',
         data={}

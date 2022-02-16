@@ -1,5 +1,6 @@
 from pydantic.main import BaseModel
 from typing import Dict
+from app.models import WritingContents
 
 
 class APIExceptionModel(BaseModel):
@@ -26,8 +27,18 @@ class DuplicateNameModel(APIExceptionModel):
     error response schema
     중복되는 필명일 경우
     '''
-
+    
     msg: str = '이미 존재하는 필명입니다.'
+    data: Dict = {}
+
+
+class NotFoundContents(APIExceptionModel):
+    '''
+    error response schema
+    해당 contents_id를 가진 컨텐츠가 없는 경우
+    '''
+
+    msg : str = 'contents_id was not founded'
     data: Dict = {}
 
 
@@ -40,6 +51,7 @@ class NotFoundContentModel(APIExceptionModel):
     msg: str = '해당 작품을 찾을 수 없습니다.'
     data: Dict = {}
 
+
 class NotOriginalContentModel(APIExceptionModel):
     '''
     error response schema
@@ -49,6 +61,7 @@ class NotOriginalContentModel(APIExceptionModel):
     msg: str = '원문이 아닙니다.'
     data: Dict = {}
 
+
 class NotFoundFeedContentModel(APIExceptionModel):
     '''
     error response schema
@@ -56,4 +69,23 @@ class NotFoundFeedContentModel(APIExceptionModel):
     '''
 
     msg: str = '작가의 작품을 찾을 수 없습니다.'
+    data: Dict = {}
+
+
+class NotProperWritingContentModel(APIExceptionModel):
+    '''
+    error response schema
+    컨텐츠의 값들이 올바르지 않은 경우
+    '''
+
+    msg: str = '컨텐츠의 내용이 올바르지 않습니다.'
+    data: Dict = {}
+
+class NotFoundMainWritersModel(APIExceptionModel):
+    '''
+    error response schema
+    메인 페이지의 작가가 없는 경우
+    '''
+
+    msg: str = '작가를 찾을 수 없습니다.'
     data: Dict = {}
