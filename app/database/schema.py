@@ -101,10 +101,10 @@ class ContentRepository:
         return result
 
     @classmethod
-    def get_by_writer_id(cls, session: Session = None, writer_id=''):
+    def get_by_writer_id(cls, session: Session = None, writer_id='', page=1):
         sess = next(db.session()) if not session else session
         result = sess.query(Content, Users).join(Users, Content.writer_id == Users.user_id).filter(
-            Content.writer_id == writer_id).order_by(Content.updated_date.desc()).all()
+            Content.writer_id == writer_id).order_by(Content.updated_date.desc()).limit(9).offset((page-1)*9).all()
         return result
 
     @classmethod
