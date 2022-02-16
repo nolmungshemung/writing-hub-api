@@ -138,19 +138,6 @@ class ContentRepository:
 
         result = sess.execute(sql)
         return result
-      
-      
-class Users(Base, UserRepository):
-    __tablename__ = "Users"
-    user_id = Column(String(length=100), primary_key=True, nullable=False)
-    user_name = Column(String(length=20), nullable=False)
-
-
-class ContentRepository:
-    def __init__(self):
-        self._q = None
-        self._session = None
-        self.served = None
 
     @classmethod
     def create_contents(cls, session: Session = None, writing_content: WritingContents = None):
@@ -181,6 +168,12 @@ class ContentRepository:
         value_views += 1
         session.query(Content).filter(Content.contents_id == contents_id).update({'views': value_views})
         session.commit()
+      
+      
+class Users(Base, UserRepository):
+    __tablename__ = "Users"
+    user_id = Column(String(length=100), primary_key=True, nullable=False)
+    user_name = Column(String(length=20), nullable=False)
 
 
 # Contents table define for api
