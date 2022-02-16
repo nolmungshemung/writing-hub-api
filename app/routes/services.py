@@ -1,6 +1,7 @@
 import time
 from fastapi import APIRouter, Depends, status
 
+from app.helper.services import get_content_total_pages
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews, EditingContents, Paging
@@ -256,6 +257,9 @@ async def feed_contents(writer_id: str = '',
     # 특정 유저가 작성한 컨텐츠를 반환하는 코드 구현(작성 일자로 내림차순 정렬)
     feed_contents = Content.get_by_writer_id(session, writer_id, page)
 
+    # 전체 페이지 수 조회
+    total_pages = get_content_total_pages(session, writer_id)
+
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(feed_contents) == 0):
         raise NotFoundFeedContentEx(writer_id=writer_id)
@@ -283,7 +287,12 @@ async def feed_contents(writer_id: str = '',
                 writer_name=writer.user_name,
                 writer_id=writer.user_id
             ),
-            feed_contents_list=feed_contents_list
+            feed_contents_list=feed_contents_list,
+            paging=Paging(
+                start= page,
+                is_last= True if total_pages == page else False,
+                total_pages= total_pages,
+            )
         )
     )
 
