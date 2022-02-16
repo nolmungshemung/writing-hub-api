@@ -63,6 +63,7 @@ class Paging(BaseModel):
 
     start: int = 0
     is_last: bool = False
+    total_pages: int = 0
 
 class MainContents(BaseModel):
     '''
@@ -88,6 +89,7 @@ class FeedContents(BaseModel):
 
     writer: Writer = {}
     feed_contents_list: List[Contents] = []
+    paging: Paging = {}
 
 
 class FeedContentsData(SuccessResponse):

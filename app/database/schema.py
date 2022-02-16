@@ -168,7 +168,14 @@ class ContentRepository:
         value_views += 1
         session.query(Content).filter(Content.contents_id == contents_id).update({'views': value_views})
         session.commit()
-      
+
+    @classmethod
+    def get_content_total_count(cls, session: Session = None, writer_id=''):
+        sess = next(db.session()) if not session else session
+        result = sess.query(Content).filter(Content.writer_id == writer_id).count()
+        return result
+
+
       
 class Users(Base, UserRepository):
     __tablename__ = "Users"
