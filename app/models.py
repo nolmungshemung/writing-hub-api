@@ -155,6 +155,7 @@ class WritingContents(BaseModel):
     language: 언어
     is_translate: 번역본 여부
     original_id: 원작 식별자 (번역이 아닌 경우 -1)
+    views: 조회수
     '''
 
     title: str = ''
@@ -165,6 +166,7 @@ class WritingContents(BaseModel):
     language: str = '한국어'
     is_translate: bool = False
     original_id: int = -1
+    views: int = 0
 
 
 class EditingContents(WritingContents):
@@ -215,6 +217,7 @@ class UserInfo(BaseModel):
 
     user_id: str = ''
     user_name: str = ''
+
 
 class UserData(SuccessResponse):
     '''

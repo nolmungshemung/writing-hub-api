@@ -69,6 +69,7 @@ class DivisionByZeroEx(APIException):
             ex=ex,
         )
 
+
 class DuplicateNameEx(APIException):
     def __init__(self, user_name: str = None, ex: Exception = None):
         super().__init__(
@@ -78,13 +79,13 @@ class DuplicateNameEx(APIException):
         )
 
 class NotFoundContentEx(APIException):
-    def __init__(self, ex: Exception = None):
+    def __init__(self, contents_id: str = None, ex: Exception = None):
         super().__init__(
             status_code=StatusCode.HTTP_404,
-            msg=f"해당 작품을 찾을 수 없습니다.",
+            msg=f"{contents_id} 해당 컨텐츠를 찾을 수 없습니다.",
             ex=ex,
         )
-
+        
 class NotOriginalContentEx(APIException):
     def __init__(self, contents_id: int = None, ex: Exception = None):
         super().__init__(
@@ -92,6 +93,7 @@ class NotOriginalContentEx(APIException):
             msg=f"{contents_id} 원문이 아닙니다.",
             ex=ex,
         )
+
 
 class NotFoundFeedContentEx(APIException):
     def __init__(self, writer_id: int = None, ex: Exception = None):
@@ -101,10 +103,10 @@ class NotFoundFeedContentEx(APIException):
             ex=ex,
         )
 
-class NotFoundMainWritersEx(APIException):
-    def __init__(self, ex: Exception = None):
+class NotProperWritingContentEx(APIException):
+    def __init__(self, wrong_value: str = None, ex: Exception = None):
         super().__init__(
-            status_code=StatusCode.HTTP_404,
-            msg="작가의 작품을 찾을 수 없습니다.",
+            status_code=StatusCode.HTTP_400,
+            msg=f"{wrong_value} 해당 컨텐츠가 잘못되었습니다.",
             ex=ex,
         )

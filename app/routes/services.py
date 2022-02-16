@@ -1,18 +1,17 @@
 import time
-
 from fastapi import APIRouter, Depends, status
 
 from app.models import Contents, Writer, MainContents, MainWriters, ReadingContents, TranslatingContents, FeedContents, \
     WritingContents, MainContentsData, MainWritersData, ReadingContentsData, TranslatingContentsData, FeedContentsData, \
     SuccessResponse, IncreaseViews, EditingContents, Paging
+
 from typing import Optional
 from app.database.conn import db
 from app.database.schema import Content, Users
 from sqlalchemy.orm import Session
 
-from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx, NotFoundMainWritersEx
-from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, \
-    NotFoundMainWritersModel
+from app.errors.exceptions import NotFoundContentEx, NotOriginalContentEx, NotFoundFeedContentEx
+from app.error_models import NotFoundContentModel, NotOriginalContentModel, NotFoundFeedContentModel, NotProperWritingContentModel, NotFoundMainWritersModel
 
 router = APIRouter(prefix='/services')
 
@@ -286,29 +285,55 @@ async def feed_contents(writer_id: str, session: Session = Depends(db.session)) 
     )
 
 
-@router.post(path='/writing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def writing_contents(data: WritingContents) -> SuccessResponse:
+@router.post(
+    path='/writing_contents',
+    response_model=SuccessResponse,
+    responses={
+        400: {"model": NotProperWritingContentModel}
+    }
+)
+async def writing_contents(data: WritingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글쓰기 페이지에서 작성한 작품 데이터를 입력받는 API
 
-    :param data: 작품 데이터:
+    :param data: 작품 데이터:\n
+    :param session: DB 세션:\n
     :return SuccessResponse:
     '''
-    print(data)
+
+    if data.title == '':
+        raise NotProperWritingContentEx(wrong_value='title')
+    if data.thumbnail == '':
+        raise NotProperWritingContentEx(wrong_value='thumbnail')
+    if data.introduction == '':
+        raise NotProperWritingContentEx(wrong_value='introduction')
+    if data.contents == '':
+        raise NotProperWritingContentEx(wrong_value='contents')
+    if data.writer_id == '':
+        raise NotProperWritingContentEx(wrong_value='writer_id')
+    if data.language == '':
+        raise NotProperWritingContentEx(wrong_value='language')
+
+    Content.create_contents(session, data)
     return SuccessResponse(
         msg='요청 성공',
         data={}
     )
 
-
 @router.post(path='/editing_contents', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def editing_contents(data: EditingContents) -> SuccessResponse:
+async def editing_contents(data: EditingContents, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     글수정 페이지에서 작성한 작품 데이터를 입력받는 API
 
     :param data: 작품 데이터:
     :return SuccessResponse:
     '''
+    content = Content.get_by_content_id(session, data.contents_id)
+    if (len(content) < 1):
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.editing_contents(session, data)
+
     print(data)
     return SuccessResponse(
         msg='요청 성공',
@@ -316,15 +341,26 @@ async def editing_contents(data: EditingContents) -> SuccessResponse:
     )
 
 
-@router.post(path='/increase_views', response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
-async def increase_views(data: IncreaseViews) -> SuccessResponse:
+@router.post(
+    path='/increase_views',
+    response_model=SuccessResponse,
+    responses={
+        404: {"model": NotFoundContentModel}
+    }
+)
+async def IncreaseContentViews(data: IncreaseViews, session: Session = Depends(db.session)) -> SuccessResponse:
     '''
     작품 조회수 카운트를 위한 API
 
     :param data: 작품 직별자:
     :return SuccessResponse:
     '''
-    print(data)
+    count = Content.count_by_contents_id(session, data.contents_id)
+    if count < 1:
+        raise NotFoundContentEx(contents_id=data.contents_id)
+
+    Content.increase_content_views(session, data.contents_id)
+
     return SuccessResponse(
         msg='요청 성공',
         data={}
