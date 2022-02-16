@@ -100,7 +100,7 @@ async def main_writers(
     '''
 
     main_writer_list = []
-    users = Users.get_main_writer(session, keyword.replace(" ", ""), start, count)
+    users = Users.get_main_writer(session, keyword.replace(" ", ""), base_time, start, count)
     for user in users:
         print(user)
         temp = Writer()
@@ -113,7 +113,7 @@ async def main_writers(
 
     # is_last 로직 작성
     is_last = False
-    next_users = Users.get_main_writer(session, keyword.replace(" ", ""), start + count, count)
+    next_users = Users.get_main_writer(session, keyword.replace(" ", ""), base_time, start + count, count)
     if next_users.rowcount > 0:
         is_last = True
 
