@@ -62,10 +62,10 @@ class UserRepository:
         return result
 
     @classmethod
-    def get_main_writer(cls, session: Session = None, user_name='', start=0, count=10):
+    def get_main_writer(cls, session: Session = None, user_name='', base_time=0, start=0, count=10):
         sess = next(db.session()) if not session else session
         sql = text("SELECT U.user_id as user_id, U.user_name as user_name, count(C.writer_id) as count"
-                   + " FROM Users U LEFT JOIN Contents C on U.user_id = C.writer_id"
+                   + " FROM Users U LEFT JOIN (SELECT * FROM Contents C WHERE UNIX_TIMESTAMP(C.created_date) <= " + "{}".format(base_time) +  ") C on U.user_id = C.writer_id"
                    + " WHERE 1=1"
                    + " AND replace(U.user_name, ' ', '') like '%" + user_name + "%'"
                    + " GROUP BY U.user_id, U.user_name"
