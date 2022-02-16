@@ -110,3 +110,11 @@ class NotProperWritingContentEx(APIException):
             msg=f"{wrong_value} 해당 컨텐츠가 잘못되었습니다.",
             ex=ex,
         )
+
+class NotFoundMainWritersEx(APIException):
+    def __init__(self, ex: Exception = None):
+        super().__init__(
+            status_code=StatusCode.HTTP_404,
+            msg="작가의 작품을 찾을 수 없습니다.",
+            ex=ex,
+        )
