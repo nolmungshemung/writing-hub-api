@@ -241,7 +241,9 @@ async def translating_contents(contents_id: int, session: Session = Depends(db.s
             responses={
                 404: {"model": NotFoundFeedContentModel}
             })
-async def feed_contents(writer_id: str, session: Session = Depends(db.session)) -> FeedContentsData:
+async def feed_contents(writer_id: str = '',
+                        page: int = 1,
+                        session: Session = Depends(db.session)) -> FeedContentsData:
     '''
     피드 페이지에서 표시되는 데이터를 반환하는 API
 
@@ -252,7 +254,7 @@ async def feed_contents(writer_id: str, session: Session = Depends(db.session)) 
     writer = Users.get(user_id=writer_id)
 
     # 특정 유저가 작성한 컨텐츠를 반환하는 코드 구현(작성 일자로 내림차순 정렬)
-    feed_contents = Content.get_by_writer_id(session, writer_id)
+    feed_contents = Content.get_by_writer_id(session, writer_id, page)
 
     # 조건에 맞는 데이터가 없는 경우 예외처리 기능 구현(404 code와 msg 반환)
     if (len(feed_contents) == 0):
