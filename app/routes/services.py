@@ -61,10 +61,10 @@ async def main_contents(
     if(len(main_contents_list) < 1):
         raise NotFoundContentEx()
 
-    # is_last 로직 작성
+    # is_last 로직 작성 (next data가 존재하지 않으면 True)
     is_last = False
     next_contents = Content.get_by_title(session, keyword.replace(" ", ""), base_time, start + count, count)
-    if next_contents.rowcount > 0:
+    if next_contents.rowcount < 0:
         is_last = True
 
     return MainContentsData(
